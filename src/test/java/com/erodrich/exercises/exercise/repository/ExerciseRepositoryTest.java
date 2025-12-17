@@ -28,6 +28,7 @@ class ExerciseRepositoryTest {
 		exercise.setName("Bench Press");
 		exercise.setGroup(MuscleGroup.CHEST);
 		entityManager.persist(exercise);
+		entityManager.flush();
 		entityManager.detach(exercise);
 		
 		// When
@@ -46,6 +47,7 @@ class ExerciseRepositoryTest {
 		exercise.setName("Bench Press");
 		exercise.setGroup(MuscleGroup.CHEST);
 		entityManager.persist(exercise);
+		entityManager.flush();
 		entityManager.detach(exercise);
 		
 		// When
@@ -62,6 +64,7 @@ class ExerciseRepositoryTest {
 		exercise.setName("Bench Press");
 		exercise.setGroup(MuscleGroup.CHEST);
 		entityManager.persist(exercise);
+		entityManager.flush();
 		entityManager.detach(exercise);
 		
 		// When
@@ -103,6 +106,7 @@ class ExerciseRepositoryTest {
 		exercise.setName("Bench Press");
 		exercise.setGroup(MuscleGroup.CHEST);
 		entityManager.persist(exercise);
+		entityManager.flush();
 		entityManager.detach(exercise);
 		
 		// When

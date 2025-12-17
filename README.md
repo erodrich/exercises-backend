@@ -27,72 +27,117 @@ A Spring Boot REST API for tracking workout exercises, sets, and progress.
 - **Java 21**
 - **Spring Boot 4.0.0**
 - **Spring Data JPA**
-- **H2 Database** (in-memory for development)
+- **PostgreSQL** (production) / **H2** (local development)
 - **Lombok** (reduce boilerplate)
 - **Maven** (build tool)
+- **Docker** (containerization)
 - **JUnit 5 & Mockito** (testing)
 
-## Architecture
-
-Clean architecture with separated concerns:
+## Project Structure
 
 ```
-├── user/                    # User domain
-│   ├── entity/             # User persistence entities
-│   ├── repository/         # Data access layer
-│   ├── dto/                # Data transfer objects
-│   ├── mapper/             # Entity-DTO mapping
-│   ├── service/            # Business logic
-│   └── UserBoundary.java   # REST controller
-├── exercise/                # Exercise domain
-│   ├── entity/             # Exercise entities (ExerciseEntity, MuscleGroup)
-│   ├── repository/         # Exercise repository
-│   ├── dto/                # Exercise DTOs
-│   ├── mapper/             # Exercise mapper
-│   ├── service/            # Exercise business logic
-│   └── ExerciseBoundary.java  # Admin REST controller
-└── exerciselogging/         # Exercise logging domain
-    ├── entity/             # Log and Set entities
-    ├── repository/         # Log repositories
-    ├── dto/                # Log DTOs
-    ├── mapper/             # Log mapper
-    ├── service/            # Logging business logic
-    └── ExerciseLoggingBoundary.java  # REST controller
+exercises-project/
+├── exercises-backend/          # This directory - Spring Boot application
+│   ├── src/                    # Source code
+│   ├── docs/                   # Documentation
+│   ├── Dockerfile              # Docker image definition
+│   ├── buildAndPush.sh         # Build and push to Docker Hub
+│   └── README.md               # This file
+│
+└── exercises-infra/            # Infrastructure as code
+    ├── dev/                    # Development environment
+    │   └── docker-compose.yml  # Dev deployment
+    └── prod/                   # Production environment
+        └── docker-compose.yml  # Prod deployment
 ```
 
-## Getting Started
+## Quick Start (Local Development)
 
-### Prerequisites
-- Java 21 or higher
-- Maven 3.6+
-
-### Running the Application
+### Option 1: H2 In-Memory (No Database Setup)
 
 ```bash
-cd exercises-backend
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-The application will start on `http://localhost:8080/exercise-logging`
-
-### H2 Console
-
-Access the H2 database console at:
-```
-http://localhost:8080/exercise-logging/h2-console
-```
-
-**Connection Details:**
-- JDBC URL: `jdbc:h2:mem:exercisedb`
+Access H2 Console: `http://localhost:8080/exercise-logging/h2-console`
+- JDBC URL: `jdbc:h2:mem:exercises`
 - Username: `sa`
-- Password: _(leave empty)_
+- Password: _(empty)_
 
-### API Documentation (Swagger UI)
+### Option 2: PostgreSQL with Docker
 
-Access the interactive API documentation at:
+```bash
+# Start PostgreSQL
+docker run -d \
+  --name postgres-dev \
+  -e POSTGRES_DB=exercises_dev \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16-alpine
+
+# Run application
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
-http://localhost:8080/exercise-logging/swagger-ui/index.html
+
+### API Access
+
+- **Base URL**: http://localhost:8080/exercise-logging
+- **Swagger UI**: http://localhost:8080/exercise-logging/swagger-ui/index.html
+- **Health Check**: http://localhost:8080/exercise-logging/actuator/health
+
+## Building Docker Image
+
+### Prerequisites
+
+- Docker installed
+- Docker Hub account
+- Set `DOCKER_USERNAME` environment variable
+
+### Build and Push
+
+```bash
+# Set your Docker Hub username
+export DOCKER_USERNAME=your-dockerhub-username
+
+# Build and push to Docker Hub
+./buildAndPush.sh 1.0.0
+
+# Or use latest tag
+./buildAndPush.sh latest
 ```
+
+The script will:
+1. Build the Docker image using multi-stage build
+2. Tag with specified version and `latest`
+3. Prompt for Docker Hub login
+4. Push images to your Docker Hub repository
+
+**Image location:** `docker.io/${DOCKER_USERNAME}/exercises-backend:version`
+
+## Deploying with Docker Compose
+
+For full deployment instructions, see the `exercises-infra` directory:
+
+### Development Deployment
+
+```bash
+cd ../exercises-infra/dev
+cp .env.example .env
+# Edit .env with your Docker Hub username
+docker-compose up -d
+```
+
+### Production Deployment
+
+```bash
+cd ../exercises-infra/prod
+cp .env.example .env
+# Edit .env with secure credentials
+docker-compose up -d
+```
+
+📖 **Full deployment guide**: [../exercises-infra/README.md](../exercises-infra/README.md)
 
 ## API Endpoints
 
@@ -112,119 +157,60 @@ http://localhost:8080/exercise-logging/swagger-ui/index.html
 - `GET /api/v1/users/{userId}/logs` - Get all logs for user
 - `POST /api/v1/users/{userId}/logs` - Create logs for user
 
-## Example Requests
-
-### Register User
-```bash
-curl -X POST http://localhost:8080/exercise-logging/api/v1/users/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "john_doe",
-    "password": "password123",
-    "email": "john@example.com"
-  }'
-```
-
-### Login User
-```bash
-curl -X POST http://localhost:8080/exercise-logging/api/v1/users/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "john_doe",
-    "password": "password123"
-  }'
-```
-
-### Create Exercise Log
-```bash
-curl -X POST http://localhost:8080/exercise-logging/api/v1/users/1/logs \
-  -H "Content-Type: application/json" \
-  -d '[
-    {
-      "timestamp": "12/16/2025 15:49:18",
-      "exercise": {
-        "group": "Chest",
-        "name": "Bench Press"
-      },
-      "sets": [
-        {"weight": 100.0, "reps": 10},
-        {"weight": 100.0, "reps": 8},
-        {"weight": 100.0, "reps": 6}
-      ],
-      "failure": false
-    }
-  ]'
-```
-
-### List All Exercises
-```bash
-curl http://localhost:8080/exercise-logging/api/v1/admin/exercises
-```
-
 ## Testing
 
-Run all tests:
 ```bash
+# Run all tests
 ./mvnw test
+
+# Run with coverage
+./mvnw test jacoco:report
 ```
 
 **Test Coverage:**
+- ✅ 64 tests passing
 - Unit tests for all mappers
-- Integration tests for repositories (with H2)
+- Integration tests for repositories (H2)
 - Unit tests with mocks for services
-- 65+ test cases total
+
+## Configuration Profiles
+
+The application supports multiple Spring profiles:
+
+| Profile | Database | Use Case | DDL Mode |
+|---------|----------|----------|----------|
+| `local` | H2 in-memory | Quick local testing | create-drop |
+| `dev` | PostgreSQL | Development | update |
+| `prod` | PostgreSQL | Production | validate |
+
+**Configuration files:**
+- `application.properties` - Common settings
+- `application-local.properties` - H2 configuration
+- `application-dev.properties` - Dev PostgreSQL
+- `application-prod.properties` - Prod PostgreSQL
 
 ## Database Schema
 
-### Users Table
-- id (PK)
-- username (unique)
-- password
-- email (unique)
-- created_at
+### Core Tables
 
-### Exercise Entity Table
-- id (PK)
-- name
-- muscle_group (enum: 0-5)
+**users**
+- id (PK), username (unique), password, email (unique), created_at
 
-### Exercise Log Entity Table
-- id (PK)
-- user_id (FK → users)
-- exercise_id (FK → exercise_entity)
-- date
-- has_failed
+**exercise_entity**
+- id (PK), name, muscle_group (0-5)
 
-### Exercise Set Entity Table
-- id (PK)
-- weight
-- reps
+**exercise_log_entity**
+- id (PK), user_id (FK), exercise_id (FK), date, has_failed
 
-### Exercise Log Sets (Join Table)
-- exercise_log_id (FK)
-- exercise_set_id (FK)
+**exercise_set_entity**
+- id (PK), weight, reps
 
-## Configuration
+**exercise_log_sets** (Join Table)
+- exercise_log_id (FK), exercise_set_id (FK)
 
-Edit `src/main/resources/application.properties`:
+### Pre-populated Data
 
-```properties
-# Context path
-server.servlet.context-path=/exercise-logging
-
-# H2 Database
-spring.datasource.url=jdbc:h2:mem:exercisedb
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2-console
-
-# JPA
-spring.jpa.hibernate.ddl-auto=create-drop
-spring.jpa.show-sql=true
-```
-
-## Pre-populated Data
-
-The database is automatically populated with 34 exercises on startup via `data.sql`:
+34 exercises automatically loaded from `data.sql`:
 - 6 Chest exercises
 - 6 Back exercises
 - 6 Shoulder exercises
@@ -232,17 +218,148 @@ The database is automatically populated with 34 exercises on startup via `data.s
 - 5 Bicep exercises
 - 5 Tricep exercises
 
-## Future Enhancements
+## Docker Image Details
 
-- [ ] Add JWT authentication
+### Multi-Stage Build
+
+**Builder Stage** (Maven + JDK 21)
+- Downloads dependencies (cached)
+- Compiles source code
+- Packages JAR file
+
+**Runtime Stage** (JRE 21 Alpine)
+- Minimal JRE environment
+- Non-root user (spring:spring)
+- Health check enabled
+- Final size: ~300MB
+
+### Image Features
+
+✅ Optimized size with multi-stage build
+✅ Security: Non-root user execution
+✅ Health checks built-in
+✅ Alpine Linux base
+✅ Supports environment variable configuration
+
+## Documentation
+
+All documentation is located in the `docs/` directory:
+
+- 📖 [ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) - Environment configuration guide
+- 📖 [CONFIGURATION_SUMMARY.md](docs/CONFIGURATION_SUMMARY.md) - Multi-environment setup
+- 📖 [DOCKER_GUIDE.md](docs/DOCKER_GUIDE.md) - Docker deployment guide
+- 📖 [DOCKER_SETUP_COMPLETE.md](docs/DOCKER_SETUP_COMPLETE.md) - Docker setup summary
+
+## Architecture
+
+Clean architecture with domain separation:
+
+```
+src/main/java/com/erodrich/exercises/
+├── user/
+│   ├── entity/           # UserEntity
+│   ├── repository/       # UserRepository
+│   ├── dto/              # UserDTO, LoginRequest, RegisterRequest
+│   ├── mapper/           # UserMapper
+│   ├── service/          # UserService
+│   └── UserBoundary.java # REST Controller
+├── exercise/
+│   ├── entity/           # ExerciseEntity, MuscleGroup
+│   ├── repository/       # ExerciseRepository
+│   ├── dto/              # ExerciseDTO
+│   ├── mapper/           # ExerciseMapper
+│   ├── service/          # ExerciseService
+│   └── ExerciseBoundary.java
+└── exerciselogging/
+    ├── entity/           # ExerciseLogEntity, ExerciseSetEntity
+    ├── repository/       # ExerciseLogRepository, ExerciseSetRepository
+    ├── dto/              # ExerciseLogDTO, ExerciseSetDTO, ExerciseDTO
+    ├── mapper/           # ExerciseLogMapper
+    ├── service/          # ExerciseLogService
+    └── ExerciseLoggingBoundary.java
+```
+
+## Environment Variables
+
+### Application
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `SPRING_PROFILES_ACTIVE` | No | `dev` | Active profile |
+| `DB_URL` | Prod | - | PostgreSQL JDBC URL |
+| `DB_USERNAME` | Prod | `postgres` | Database username |
+| `DB_PASSWORD` | Prod | - | Database password |
+
+### Docker Build
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DOCKER_USERNAME` | Yes | Your Docker Hub username |
+
+## Production Deployment
+
+### Deployment Options
+
+1. **Docker Compose** (Recommended for single server)
+   - See `exercises-infra/prod/docker-compose.yml`
+
+2. **Kubernetes**
+   - Convert compose files with `kompose`
+   - Apply manifests to cluster
+
+3. **Cloud Platforms**
+   - AWS ECS/Fargate
+   - Google Cloud Run
+   - Azure Container Instances
+
+### Production Checklist
+
+- [ ] Build and push image with version tag
+- [ ] Set strong database password
+- [ ] Use specific image version (not `latest`)
+- [ ] Configure environment variables
+- [ ] Set up database backups
+- [ ] Configure monitoring and alerts
+- [ ] Enable SSL/TLS for database
+- [ ] Review security settings
+- [ ] Set up log aggregation
+- [ ] Test rollback procedure
+
+## Development Roadmap
+
+### Implemented ✅
+- REST API with CRUD operations
+- User management (registration/login)
+- Exercise administration
+- Workout logging with sets
+- PostgreSQL support
+- Docker containerization
+- Multi-environment configuration
+- Comprehensive documentation
+- Health check endpoints
+
+### Planned Enhancements
+- [ ] JWT authentication & authorization
 - [ ] Password encryption (BCrypt)
+- [ ] Database migrations (Flyway)
 - [ ] Workout programs/routines
 - [ ] Progress tracking and analytics
-- [ ] REST API versioning
-- [ ] PostgreSQL for production
-- [ ] Docker containerization
-- [ ] CI/CD pipeline
+- [ ] Advanced search and filtering
+- [ ] API versioning
+- [ ] Rate limiting
+- [ ] WebSocket for real-time updates
+
+## Contributing
+
+This is an educational project. Contributions and suggestions are welcome!
 
 ## License
 
-This project is for educational purposes.
+Educational purposes only.
+
+---
+
+**Need help?**
+- Check [docs/](docs/) for detailed guides
+- Review deployment docs in [exercises-infra/](../exercises-infra/)
+- Open an issue for bugs or questions
