@@ -1,0 +1,40 @@
+# Build artifacts
+target/
+*.jar
+*.war
+*.ear
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+
+# Environment files
+.env
+.env.*
+*.log
+
+# Documentation
+*.md
+HELP.md
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Other
+.DS_Store
+*.swp
+*.swo
+*~
