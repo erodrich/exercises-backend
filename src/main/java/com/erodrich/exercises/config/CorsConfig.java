@@ -27,6 +27,7 @@ public class CorsConfig {
                         .allowedOrigins(origins)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                         .allowedHeaders("*")
+                        .exposedHeaders("Authorization") // Expose JWT token header
                         .allowCredentials(true)
                         .maxAge(3600); // Cache preflight response for 1 hour
             }

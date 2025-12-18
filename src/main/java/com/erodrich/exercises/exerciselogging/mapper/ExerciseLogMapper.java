@@ -1,7 +1,10 @@
 package com.erodrich.exercises.exerciselogging.mapper;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +22,15 @@ import com.erodrich.exercises.exerciselogging.entity.ExerciseSetEntity;
 @Component
 public class ExerciseLogMapper {
 
-	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+	private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+	
+	// Support multiple input formats
+	private static final DateTimeFormatter[] INPUT_FORMATTERS = {
+			DateTimeFormatter.ISO_DATE_TIME,                    // ISO 8601: 2025-12-18T22:00:00.000Z
+			DateTimeFormatter.ISO_LOCAL_DATE_TIME,              // 2025-12-18T22:00:00
+			DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"), // US format: 12/18/2025 22:00:00
+			DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")  // GB format: 18/12/2025 22:00:00
+	};
 
 	public ExerciseLogEntity toEntity(ExerciseLogDTO dto) {
 		if (dto == null) {
@@ -109,17 +120,37 @@ public class ExerciseLogMapper {
 		return dto;
 	}
 
-	private LocalDateTime parseTimestamp(String timestamp) {
+		private LocalDateTime parseTimestamp(String timestamp) {
 		if (timestamp == null || timestamp.isEmpty()) {
 			return LocalDateTime.now();
 		}
-		return LocalDateTime.parse(timestamp, FORMATTER);
+		
+		// First, try to parse as ISO 8601 with timezone (e.g., "2025-12-18T21:16:15.651Z")
+		try {
+			Instant instant = Instant.parse(timestamp);
+			return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+		} catch (DateTimeParseException e) {
+			// Not an ISO 8601 with timezone, try other formats
+		}
+		
+		// Try parsing with each formatter until one succeeds
+		for (DateTimeFormatter formatter : INPUT_FORMATTERS) {
+			try {
+				return LocalDateTime.parse(timestamp, formatter);
+			} catch (DateTimeParseException e) {
+				// Try next formatter
+			}
+		}
+		
+		// If all formatters fail, return current time and log warning
+		System.err.println("Failed to parse timestamp: " + timestamp + ", using current time");
+		return LocalDateTime.now();
 	}
 
 	private String formatTimestamp(LocalDateTime dateTime) {
 		if (dateTime == null) {
 			return null;
 		}
-		return dateTime.format(FORMATTER);
+		return dateTime.format(OUTPUT_FORMATTER);
 	}
 }

@@ -51,7 +51,7 @@ class UserRepositoryTest {
 	}
 	
 	@Test
-	void findByUsernameAndPassword_whenCredentialsMatch_shouldReturnUser() {
+	void findByEmail_whenUserExists_shouldReturnUser() {
 		// Given
 		UserEntity user = new UserEntity();
 		user.setUsername("testuser");
@@ -62,44 +62,18 @@ class UserRepositoryTest {
 		entityManager.flush();
 		
 		// When
-		Optional<UserEntity> found = userRepository.findByUsernameAndPassword("testuser", "password123");
+		Optional<UserEntity> found = userRepository.findByEmail("test@email.com");
 		
 		// Then
 		assertThat(found).isPresent();
+		assertThat(found.get().getEmail()).isEqualTo("test@email.com");
 		assertThat(found.get().getUsername()).isEqualTo("testuser");
 	}
 	
 	@Test
-	void findByUsernameAndPassword_whenPasswordWrong_shouldReturnEmpty() {
-		// Given
-		UserEntity user = new UserEntity();
-		user.setUsername("testuser");
-		user.setPassword("password123");
-		user.setEmail("test@email.com");
-		user.setCreatedAt(LocalDateTime.now());
-		entityManager.persist(user);
-		entityManager.flush();
-		
+	void findByEmail_whenUserDoesNotExist_shouldReturnEmpty() {
 		// When
-		Optional<UserEntity> found = userRepository.findByUsernameAndPassword("testuser", "wrongpassword");
-		
-		// Then
-		assertThat(found).isEmpty();
-	}
-	
-	@Test
-	void findByUsernameAndPassword_whenUsernameWrong_shouldReturnEmpty() {
-		// Given
-		UserEntity user = new UserEntity();
-		user.setUsername("testuser");
-		user.setPassword("password123");
-		user.setEmail("test@email.com");
-		user.setCreatedAt(LocalDateTime.now());
-		entityManager.persist(user);
-		entityManager.flush();
-		
-		// When
-		Optional<UserEntity> found = userRepository.findByUsernameAndPassword("wronguser", "password123");
+		Optional<UserEntity> found = userRepository.findByEmail("nonexistent@email.com");
 		
 		// Then
 		assertThat(found).isEmpty();

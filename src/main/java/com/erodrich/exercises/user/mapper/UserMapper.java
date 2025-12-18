@@ -1,7 +1,5 @@
 package com.erodrich.exercises.user.mapper;
 
-import java.time.format.DateTimeFormatter;
-
 import org.springframework.stereotype.Component;
 
 import com.erodrich.exercises.user.dto.RegisterRequest;
@@ -10,8 +8,6 @@ import com.erodrich.exercises.user.entity.UserEntity;
 
 @Component
 public class UserMapper {
-	
-	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
 	
 	public UserEntity toEntity(RegisterRequest request) {
 		if (request == null) {
@@ -32,11 +28,9 @@ public class UserMapper {
 		}
 		
 		UserDTO dto = new UserDTO();
-		dto.setId(entity.getId());
+		dto.setId(entity.getId().toString());
 		dto.setUsername(entity.getUsername());
 		dto.setEmail(entity.getEmail());
-		dto.setCreatedAt(entity.getCreatedAt() != null ? 
-				entity.getCreatedAt().format(FORMATTER) : null);
 		
 		return dto;
 	}

@@ -23,7 +23,7 @@ class UserMapperTest {
 	@Test
 	void toEntity_withValidRequest_shouldMapCorrectly() {
 		// Given
-		RegisterRequest request = new RegisterRequest("testuser", "password123", "test@email.com");
+		RegisterRequest request = new RegisterRequest("testuser", "test@email.com", "password123");
 		
 		// When
 		UserEntity entity = userMapper.toEntity(request);
@@ -61,10 +61,9 @@ class UserMapperTest {
 		
 		// Then
 		assertThat(dto).isNotNull();
-		assertThat(dto.getId()).isEqualTo(1L);
+		assertThat(dto.getId()).isEqualTo("1");
 		assertThat(dto.getUsername()).isEqualTo("testuser");
 		assertThat(dto.getEmail()).isEqualTo("test@email.com");
-		assertThat(dto.getCreatedAt()).isEqualTo("12/16/2025 10:30:00");
 	}
 	
 	@Test
@@ -77,19 +76,19 @@ class UserMapperTest {
 	}
 	
 	@Test
-	void toDTO_withNullCreatedAt_shouldHandleGracefully() {
+	void toDTO_withDifferentIdTypes_shouldConvertToString() {
 		// Given
 		UserEntity entity = new UserEntity();
-		entity.setId(1L);
+		entity.setId(42L);
 		entity.setUsername("testuser");
 		entity.setEmail("test@email.com");
-		entity.setCreatedAt(null);
+		entity.setCreatedAt(LocalDateTime.now());
 		
 		// When
 		UserDTO dto = userMapper.toDTO(entity);
 		
 		// Then
 		assertThat(dto).isNotNull();
-		assertThat(dto.getCreatedAt()).isNull();
+		assertThat(dto.getId()).isEqualTo("42");
 	}
 }

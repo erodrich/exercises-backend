@@ -2,6 +2,7 @@ package com.erodrich.exercises.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,35 +10,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.erodrich.exercises.user.dto.AuthResponse;
 import com.erodrich.exercises.user.dto.LoginRequest;
 import com.erodrich.exercises.user.dto.RegisterRequest;
 import com.erodrich.exercises.user.dto.UserDTO;
 import com.erodrich.exercises.user.service.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/api/v1/users")
+@Validated
 public class UserBoundary {
 	
 	private final UserService userService;
 	
 	@PostMapping("/register")
-	public ResponseEntity<UserDTO> register(@RequestBody RegisterRequest request) {
+	public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
 		try {
-			UserDTO user = userService.register(request);
-			return ResponseEntity.status(HttpStatus.CREATED).body(user);
+			AuthResponse response = userService.register(request);
+			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		}
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<UserDTO> login(@RequestBody LoginRequest request) {
+	public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
 		try {
-			UserDTO user = userService.login(request);
-			return ResponseEntity.ok(user);
+			AuthResponse response = userService.login(request);
+			return ResponseEntity.ok(response);
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
