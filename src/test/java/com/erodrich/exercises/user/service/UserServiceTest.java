@@ -23,6 +23,7 @@ import com.erodrich.exercises.user.dto.AuthResponse;
 import com.erodrich.exercises.user.dto.LoginRequest;
 import com.erodrich.exercises.user.dto.RegisterRequest;
 import com.erodrich.exercises.user.dto.UserDTO;
+import com.erodrich.exercises.user.entity.Role;
 import com.erodrich.exercises.user.entity.UserEntity;
 import com.erodrich.exercises.user.mapper.UserMapper;
 import com.erodrich.exercises.user.repository.UserRepository;
@@ -54,15 +55,21 @@ class UserServiceTest {
 		entity.setUsername("testuser");
 		entity.setPassword("hashedPassword");
 		entity.setEmail("test@email.com");
+		entity.setRole(Role.USER);
 		
 		UserEntity savedEntity = new UserEntity();
 		savedEntity.setId(1L);
 		savedEntity.setUsername("testuser");
 		savedEntity.setPassword("hashedPassword");
 		savedEntity.setEmail("test@email.com");
+		savedEntity.setRole(Role.USER);
 		savedEntity.setCreatedAt(LocalDateTime.now());
 		
-		UserDTO expectedDTO = new UserDTO("1", "testuser", "test@email.com");
+		UserDTO expectedDTO = new UserDTO();
+		expectedDTO.setId("1");
+		expectedDTO.setUsername("testuser");
+		expectedDTO.setEmail("test@email.com");
+		expectedDTO.setRole(Role.USER);
 		String expectedToken = "jwt.token.here";
 		
 		when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
@@ -71,7 +78,7 @@ class UserServiceTest {
 		when(userMapper.toEntity(request)).thenReturn(entity);
 		when(userRepository.save(any(UserEntity.class))).thenReturn(savedEntity);
 		when(userMapper.toDTO(savedEntity)).thenReturn(expectedDTO);
-		when(jwtTokenProvider.generateToken("test@email.com")).thenReturn(expectedToken);
+		when(jwtTokenProvider.generateToken("test@email.com", "ROLE_USER")).thenReturn(expectedToken);
 		
 		// When
 		AuthResponse result = userService.register(request);
@@ -83,7 +90,7 @@ class UserServiceTest {
 		assertThat(result.getToken()).isEqualTo(expectedToken);
 		verify(passwordEncoder).encode("password123");
 		verify(userRepository).save(any(UserEntity.class));
-		verify(jwtTokenProvider).generateToken("test@email.com");
+		verify(jwtTokenProvider).generateToken("test@email.com", "ROLE_USER");
 	}
 	
 	@Test
@@ -129,14 +136,19 @@ class UserServiceTest {
 		user.setUsername("testuser");
 		user.setEmail("test@email.com");
 		user.setPassword("hashedPassword");
+		user.setRole(Role.USER);
 		
-		UserDTO expectedDTO = new UserDTO("1", "testuser", "test@email.com");
+		UserDTO expectedDTO = new UserDTO();
+		expectedDTO.setId("1");
+		expectedDTO.setUsername("testuser");
+		expectedDTO.setEmail("test@email.com");
+		expectedDTO.setRole(Role.USER);
 		String expectedToken = "jwt.token.here";
 		
 		when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
 		when(passwordEncoder.matches("password123", "hashedPassword")).thenReturn(true);
 		when(userMapper.toDTO(user)).thenReturn(expectedDTO);
-		when(jwtTokenProvider.generateToken("test@email.com")).thenReturn(expectedToken);
+		when(jwtTokenProvider.generateToken("test@email.com", "ROLE_USER")).thenReturn(expectedToken);
 		
 		// When
 		AuthResponse result = userService.login(request);
@@ -147,7 +159,7 @@ class UserServiceTest {
 		assertThat(result.getUser().getUsername()).isEqualTo("testuser");
 		assertThat(result.getToken()).isEqualTo(expectedToken);
 		verify(passwordEncoder).matches("password123", "hashedPassword");
-		verify(jwtTokenProvider).generateToken("test@email.com");
+		verify(jwtTokenProvider).generateToken("test@email.com", "ROLE_USER");
 	}
 	
 	@Test
@@ -188,8 +200,13 @@ class UserServiceTest {
 		user.setId(1L);
 		user.setUsername("testuser");
 		user.setEmail("test@email.com");
+		user.setRole(Role.USER);
 		
-		UserDTO expectedDTO = new UserDTO("1", "testuser", "test@email.com");
+		UserDTO expectedDTO = new UserDTO();
+		expectedDTO.setId("1");
+		expectedDTO.setUsername("testuser");
+		expectedDTO.setEmail("test@email.com");
+		expectedDTO.setRole(Role.USER);
 		
 		when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 		when(userMapper.toDTO(user)).thenReturn(expectedDTO);
