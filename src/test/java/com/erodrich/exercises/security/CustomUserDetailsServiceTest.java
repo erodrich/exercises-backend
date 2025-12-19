@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.erodrich.exercises.security.service.CustomUserDetailsService;
+import com.erodrich.exercises.user.entity.Role;
 import com.erodrich.exercises.user.entity.UserEntity;
 import com.erodrich.exercises.user.repository.UserRepository;
 
@@ -37,6 +38,7 @@ class CustomUserDetailsServiceTest {
 		user.setUsername("testuser");
 		user.setEmail(email);
 		user.setPassword("hashedPassword");
+		user.setRole(Role.USER);
 		user.setCreatedAt(LocalDateTime.now());
 		
 		when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
@@ -48,7 +50,8 @@ class CustomUserDetailsServiceTest {
 		assertThat(userDetails).isNotNull();
 		assertThat(userDetails.getUsername()).isEqualTo(email);
 		assertThat(userDetails.getPassword()).isEqualTo("hashedPassword");
-		assertThat(userDetails.getAuthorities()).isEmpty();
+		assertThat(userDetails.getAuthorities()).hasSize(1);
+		assertThat(userDetails.getAuthorities().iterator().next().getAuthority()).isEqualTo("ROLE_USER");
 		assertThat(userDetails.isEnabled()).isTrue();
 		assertThat(userDetails.isAccountNonExpired()).isTrue();
 		assertThat(userDetails.isAccountNonLocked()).isTrue();
@@ -76,10 +79,12 @@ class CustomUserDetailsServiceTest {
 		UserEntity user1 = new UserEntity();
 		user1.setEmail(email1);
 		user1.setPassword("password1");
+		user1.setRole(Role.USER);
 		
 		UserEntity user2 = new UserEntity();
 		user2.setEmail(email2);
 		user2.setPassword("password2");
+		user2.setRole(Role.ADMIN);
 		
 		when(userRepository.findByEmail(email1)).thenReturn(Optional.of(user1));
 		when(userRepository.findByEmail(email2)).thenReturn(Optional.of(user2));

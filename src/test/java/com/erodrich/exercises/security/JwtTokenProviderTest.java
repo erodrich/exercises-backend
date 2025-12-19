@@ -33,9 +33,10 @@ class JwtTokenProviderTest {
 	void generateToken_withValidEmail_shouldReturnToken() {
 		// Given
 		String email = "test@email.com";
+		String role = "ROLE_USER";
 		
 		// When
-		String token = jwtTokenProvider.generateToken(email);
+		String token = jwtTokenProvider.generateToken(email, role);
 		
 		// Then
 		assertThat(token).isNotNull();
@@ -47,7 +48,8 @@ class JwtTokenProviderTest {
 	void getEmailFromToken_withValidToken_shouldReturnEmail() {
 		// Given
 		String email = "test@email.com";
-		String token = jwtTokenProvider.generateToken(email);
+		String role = "ROLE_USER";
+		String token = jwtTokenProvider.generateToken(email, role);
 		
 		// When
 		String extractedEmail = jwtTokenProvider.getEmailFromToken(token);
@@ -60,7 +62,8 @@ class JwtTokenProviderTest {
 	void validateToken_withValidToken_shouldReturnTrue() {
 		// Given
 		String email = "test@email.com";
-		String token = jwtTokenProvider.generateToken(email);
+		String role = "ROLE_USER";
+		String token = jwtTokenProvider.generateToken(email, role);
 		
 		// When
 		boolean isValid = jwtTokenProvider.validateToken(token);
@@ -89,7 +92,7 @@ class JwtTokenProviderTest {
 		ReflectionTestUtils.setField(shortExpiryProperties, "expiration", -1L); // Already expired
 		
 		JwtTokenProvider shortExpiryProvider = new JwtTokenProvider(shortExpiryProperties);
-		String expiredToken = shortExpiryProvider.generateToken("test@email.com");
+		String expiredToken = shortExpiryProvider.generateToken("test@email.com", "ROLE_USER");
 		
 		// When
 		boolean isValid = jwtTokenProvider.validateToken(expiredToken);
@@ -121,10 +124,11 @@ class JwtTokenProviderTest {
 		// Given
 		String email1 = "user1@email.com";
 		String email2 = "user2@email.com";
+		String role = "ROLE_USER";
 		
 		// When
-		String token1 = jwtTokenProvider.generateToken(email1);
-		String token2 = jwtTokenProvider.generateToken(email2);
+		String token1 = jwtTokenProvider.generateToken(email1, role);
+		String token2 = jwtTokenProvider.generateToken(email2, role);
 		
 		// Then
 		assertThat(token1).isNotEqualTo(token2);
@@ -136,7 +140,8 @@ class JwtTokenProviderTest {
 	void tokenContainsCorrectClaims() {
 		// Given
 		String email = "test@email.com";
-		String token = jwtTokenProvider.generateToken(email);
+		String role = "ROLE_ADMIN";
+		String token = jwtTokenProvider.generateToken(email, role);
 		
 		// When - Parse token manually to verify claims
 		Claims claims = Jwts.parser()
@@ -147,8 +152,23 @@ class JwtTokenProviderTest {
 		
 		// Then
 		assertThat(claims.getSubject()).isEqualTo(email);
+		assertThat(claims.get("role")).isEqualTo(role);
 		assertThat(claims.getIssuedAt()).isNotNull();
 		assertThat(claims.getExpiration()).isNotNull();
 		assertThat(claims.getExpiration().getTime()).isGreaterThan(claims.getIssuedAt().getTime());
+	}
+	
+	@Test
+	void getRoleFromToken_withValidToken_shouldReturnRole() {
+		// Given
+		String email = "admin@email.com";
+		String role = "ROLE_ADMIN";
+		String token = jwtTokenProvider.generateToken(email, role);
+		
+		// When
+		String extractedRole = jwtTokenProvider.getRoleFromToken(token);
+		
+		// Then
+		assertThat(extractedRole).isEqualTo(role);
 	}
 }

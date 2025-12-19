@@ -43,8 +43,11 @@ public class UserService {
 		// Save user
 		UserEntity savedEntity = userRepository.save(entity);
 		
-		// Generate JWT token using email (email is our username)
-		String token = jwtTokenProvider.generateToken(savedEntity.getEmail());
+		// Generate JWT token using email and role
+		String token = jwtTokenProvider.generateToken(
+			savedEntity.getEmail(), 
+			"ROLE_" + savedEntity.getRole().name()
+		);
 		
 		// Return response with user and token
 		UserDTO userDTO = userMapper.toDTO(savedEntity);
@@ -62,8 +65,11 @@ public class UserService {
 			throw new IllegalArgumentException("Invalid email or password");
 		}
 		
-		// Generate JWT token using email (email is our username)
-		String token = jwtTokenProvider.generateToken(user.getEmail());
+		// Generate JWT token using email and role
+		String token = jwtTokenProvider.generateToken(
+			user.getEmail(),
+			"ROLE_" + user.getRole().name()
+		);
 		
 		// Return response with user and token
 		UserDTO userDTO = userMapper.toDTO(user);
