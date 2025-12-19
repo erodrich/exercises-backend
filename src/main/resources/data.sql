@@ -1,3 +1,8 @@
+-- Pre-populate admin user
+-- Password: Admin123! (BCrypt encoded)
+INSERT INTO users (id, username, email, password, role, created_at) 
+VALUES (1, 'admin', 'admin@exercises.com', '$2a$10$xLzJhIvdZXG6k5bvJYmW7.hN8l9LCQYqN5d8fB3EHqJqyYmM8L9Ta', 'ADMIN', CURRENT_TIMESTAMP);
+
 -- Pre-populate Exercise table with common exercises
 
 -- Chest Exercises (CHEST = 0)
