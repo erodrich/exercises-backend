@@ -8,9 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.erodrich.exercises.exercise.dto.ExerciseDTO;
 import com.erodrich.exercises.exercise.entity.ExerciseEntity;
-import com.erodrich.exercises.exercise.entity.MuscleGroup;
 import com.erodrich.exercises.exercise.mapper.ExerciseMapper;
 import com.erodrich.exercises.exercise.repository.ExerciseRepository;
+import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
+import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +21,7 @@ public class ExerciseService {
 	
 	private final ExerciseRepository exerciseRepository;
 	private final ExerciseMapper mapper;
+	private final MuscleGroupRepository muscleGroupRepository;
 	
 	@Transactional(readOnly = true)
 	public List<ExerciseDTO> getAllExercises() {
@@ -37,17 +39,13 @@ public class ExerciseService {
 	
 	@Transactional
 	public ExerciseDTO createExercise(ExerciseDTO dto) {
-		// Validate muscle group
-		try {
-			MuscleGroup.valueOf(dto.getGroup().toUpperCase());
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("Invalid muscle group: " + dto.getGroup());
-		}
+		// Validate muscle group exists
+		MuscleGroupEntity muscleGroup = muscleGroupRepository
+				.findByNameIgnoreCase(dto.getGroup())
+				.orElseThrow(() -> new IllegalArgumentException("Invalid muscle group: " + dto.getGroup()));
 		
 		// Check if exercise already exists
-		if (exerciseRepository.findByNameAndGroup(
-				dto.getName(), 
-				MuscleGroup.valueOf(dto.getGroup().toUpperCase())).isPresent()) {
+		if (exerciseRepository.findByNameAndMuscleGroup(dto.getName(), muscleGroup).isPresent()) {
 			throw new IllegalArgumentException("Exercise already exists");
 		}
 		
@@ -63,15 +61,13 @@ public class ExerciseService {
 		ExerciseEntity existing = exerciseRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("Exercise not found"));
 		
-		// Validate muscle group
-		try {
-			MuscleGroup.valueOf(dto.getGroup().toUpperCase());
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("Invalid muscle group: " + dto.getGroup());
-		}
+		// Validate muscle group exists
+		MuscleGroupEntity muscleGroup = muscleGroupRepository
+				.findByNameIgnoreCase(dto.getGroup())
+				.orElseThrow(() -> new IllegalArgumentException("Invalid muscle group: " + dto.getGroup()));
 		
 		existing.setName(dto.getName());
-		existing.setGroup(MuscleGroup.valueOf(dto.getGroup().toUpperCase()));
+		existing.setMuscleGroup(muscleGroup);
 		
 		ExerciseEntity updated = exerciseRepository.save(existing);
 		return mapper.toDTO(updated);

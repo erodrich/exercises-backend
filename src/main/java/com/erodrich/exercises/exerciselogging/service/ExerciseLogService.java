@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.erodrich.exercises.exercise.entity.ExerciseEntity;
-import com.erodrich.exercises.exercise.entity.MuscleGroup;
 import com.erodrich.exercises.exercise.repository.ExerciseRepository;
+import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
+import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseLogDTO;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseSetDTO;
 import com.erodrich.exercises.exerciselogging.entity.ExerciseLogEntity;
@@ -32,6 +33,7 @@ public class ExerciseLogService {
 	private final ExerciseSetRepository exerciseSetRepository;
 	private final UserRepository userRepository;
 	private final ExerciseLogMapper mapper;
+	private final MuscleGroupRepository muscleGroupRepository;
 
 	@Transactional
 	public List<ExerciseLogDTO> saveLogs(Long userId, List<ExerciseLogDTO> logDTOs) {
@@ -60,10 +62,16 @@ public class ExerciseLogService {
 		ExerciseLogEntity logEntity = mapper.toEntity(dto);
 		logEntity.setUser(user);
 
+		// Look up muscle group
+		MuscleGroupEntity muscleGroup = muscleGroupRepository
+				.findByNameIgnoreCase(dto.getExercise().getGroup())
+				.orElseThrow(() -> new IllegalArgumentException(
+						"Invalid muscle group: " + dto.getExercise().getGroup()));
+		
 		// Find or create exercise
 		ExerciseEntity exercise = findOrCreateExercise(
 				dto.getExercise().getName(),
-				MuscleGroup.valueOf(dto.getExercise().getGroup().toUpperCase())
+				muscleGroup
 		);
 		logEntity.setExercise(exercise);
 
@@ -81,12 +89,12 @@ public class ExerciseLogService {
 		return logEntity;
 	}
 
-	private ExerciseEntity findOrCreateExercise(String name, MuscleGroup group) {
-		return exerciseRepository.findByNameAndGroup(name, group)
+	private ExerciseEntity findOrCreateExercise(String name, MuscleGroupEntity muscleGroup) {
+		return exerciseRepository.findByNameAndMuscleGroup(name, muscleGroup)
 				.orElseGet(() -> {
 					ExerciseEntity newExercise = new ExerciseEntity();
 					newExercise.setName(name);
-					newExercise.setGroup(group);
+					newExercise.setMuscleGroup(muscleGroup);
 					return exerciseRepository.save(newExercise);
 				});
 	}

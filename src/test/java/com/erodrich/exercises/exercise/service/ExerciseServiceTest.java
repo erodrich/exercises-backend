@@ -18,9 +18,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.erodrich.exercises.exercise.dto.ExerciseDTO;
 import com.erodrich.exercises.exercise.entity.ExerciseEntity;
-import com.erodrich.exercises.exercise.entity.MuscleGroup;
 import com.erodrich.exercises.exercise.mapper.ExerciseMapper;
 import com.erodrich.exercises.exercise.repository.ExerciseRepository;
+import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
+import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ExerciseServiceTest {
@@ -31,21 +32,27 @@ class ExerciseServiceTest {
 	@Mock
 	private ExerciseMapper exerciseMapper;
 	
+	@Mock
+	private MuscleGroupRepository muscleGroupRepository;
+	
 	@InjectMocks
 	private ExerciseService exerciseService;
 	
 	@Test
 	void getAllExercises_shouldReturnListOfExercises() {
 		// Given
+		MuscleGroupEntity chest = new MuscleGroupEntity(1L, "CHEST", "Chest exercises");
+		MuscleGroupEntity legs = new MuscleGroupEntity(4L, "LEGS", "Leg exercises");
+		
 		ExerciseEntity entity1 = new ExerciseEntity();
 		entity1.setId(1L);
 		entity1.setName("Bench Press");
-		entity1.setGroup(MuscleGroup.CHEST);
+		entity1.setMuscleGroup(chest);
 		
 		ExerciseEntity entity2 = new ExerciseEntity();
 		entity2.setId(2L);
 		entity2.setName("Squat");
-		entity2.setGroup(MuscleGroup.LEGS);
+		entity2.setMuscleGroup(legs);
 		
 		ExerciseDTO dto1 = new ExerciseDTO(1L, "Bench Press", "CHEST");
 		ExerciseDTO dto2 = new ExerciseDTO(2L, "Squat", "LEGS");
@@ -66,10 +73,12 @@ class ExerciseServiceTest {
 	@Test
 	void getExerciseById_whenExists_shouldReturnExercise() {
 		// Given
+		MuscleGroupEntity back = new MuscleGroupEntity(2L, "BACK", "Back exercises");
+		
 		ExerciseEntity entity = new ExerciseEntity();
 		entity.setId(1L);
 		entity.setName("Deadlift");
-		entity.setGroup(MuscleGroup.BACK);
+		entity.setMuscleGroup(back);
 		
 		ExerciseDTO dto = new ExerciseDTO(1L, "Deadlift", "BACK");
 		
@@ -99,19 +108,21 @@ class ExerciseServiceTest {
 	void createExercise_withValidData_shouldReturnCreatedExercise() {
 		// Given
 		ExerciseDTO dto = new ExerciseDTO(null, "Pull Up", "BACK");
+		MuscleGroupEntity back = new MuscleGroupEntity(2L, "BACK", "Back exercises");
 		
 		ExerciseEntity entity = new ExerciseEntity();
 		entity.setName("Pull Up");
-		entity.setGroup(MuscleGroup.BACK);
+		entity.setMuscleGroup(back);
 		
 		ExerciseEntity savedEntity = new ExerciseEntity();
 		savedEntity.setId(1L);
 		savedEntity.setName("Pull Up");
-		savedEntity.setGroup(MuscleGroup.BACK);
+		savedEntity.setMuscleGroup(back);
 		
 		ExerciseDTO savedDTO = new ExerciseDTO(1L, "Pull Up", "BACK");
 		
-		when(exerciseRepository.findByNameAndGroup("Pull Up", MuscleGroup.BACK)).thenReturn(Optional.empty());
+		when(muscleGroupRepository.findByNameIgnoreCase("BACK")).thenReturn(Optional.of(back));
+		when(exerciseRepository.findByNameAndMuscleGroup("Pull Up", back)).thenReturn(Optional.empty());
 		when(exerciseMapper.toEntity(dto)).thenReturn(entity);
 		when(exerciseRepository.save(any(ExerciseEntity.class))).thenReturn(savedEntity);
 		when(exerciseMapper.toDTO(savedEntity)).thenReturn(savedDTO);
@@ -130,6 +141,8 @@ class ExerciseServiceTest {
 		// Given
 		ExerciseDTO dto = new ExerciseDTO(null, "Test", "INVALID");
 		
+		when(muscleGroupRepository.findByNameIgnoreCase("INVALID")).thenReturn(Optional.empty());
+		
 		// When/Then
 		assertThatThrownBy(() -> exerciseService.createExercise(dto))
 			.isInstanceOf(IllegalArgumentException.class)
@@ -140,12 +153,14 @@ class ExerciseServiceTest {
 	void createExercise_withDuplicateExercise_shouldThrowException() {
 		// Given
 		ExerciseDTO dto = new ExerciseDTO(null, "Bench Press", "CHEST");
+		MuscleGroupEntity chest = new MuscleGroupEntity(1L, "CHEST", "Chest exercises");
 		
 		ExerciseEntity existingEntity = new ExerciseEntity();
 		existingEntity.setName("Bench Press");
-		existingEntity.setGroup(MuscleGroup.CHEST);
+		existingEntity.setMuscleGroup(chest);
 		
-		when(exerciseRepository.findByNameAndGroup("Bench Press", MuscleGroup.CHEST))
+		when(muscleGroupRepository.findByNameIgnoreCase("CHEST")).thenReturn(Optional.of(chest));
+		when(exerciseRepository.findByNameAndMuscleGroup("Bench Press", chest))
 			.thenReturn(Optional.of(existingEntity));
 		
 		// When/Then
@@ -157,21 +172,25 @@ class ExerciseServiceTest {
 	@Test
 	void updateExercise_whenExists_shouldReturnUpdatedExercise() {
 		// Given
+		MuscleGroupEntity chest = new MuscleGroupEntity(1L, "CHEST", "Chest exercises");
+		MuscleGroupEntity back = new MuscleGroupEntity(2L, "BACK", "Back exercises");
+		
 		ExerciseEntity existing = new ExerciseEntity();
 		existing.setId(1L);
 		existing.setName("Old Name");
-		existing.setGroup(MuscleGroup.CHEST);
+		existing.setMuscleGroup(chest);
 		
 		ExerciseDTO dto = new ExerciseDTO(1L, "New Name", "BACK");
 		
 		ExerciseEntity updatedEntity = new ExerciseEntity();
 		updatedEntity.setId(1L);
 		updatedEntity.setName("New Name");
-		updatedEntity.setGroup(MuscleGroup.BACK);
+		updatedEntity.setMuscleGroup(back);
 		
 		ExerciseDTO updatedDTO = new ExerciseDTO(1L, "New Name", "BACK");
 		
 		when(exerciseRepository.findById(1L)).thenReturn(Optional.of(existing));
+		when(muscleGroupRepository.findByNameIgnoreCase("BACK")).thenReturn(Optional.of(back));
 		when(exerciseRepository.save(existing)).thenReturn(updatedEntity);
 		when(exerciseMapper.toDTO(updatedEntity)).thenReturn(updatedDTO);
 		
