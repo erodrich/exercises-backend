@@ -12,8 +12,8 @@ import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.erodrich.exercises.exercise.entity.ExerciseEntity;
-import com.erodrich.exercises.exercise.entity.MuscleGroup;
 import com.erodrich.exercises.exerciselogging.entity.ExerciseLogEntity;
+import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
 import com.erodrich.exercises.user.entity.UserEntity;
 
 @DataJpaTest
@@ -35,10 +35,15 @@ class ExerciseLogRepositoryTest {
 		user.setEmail("test@email.com");
 		user.setCreatedAt(LocalDateTime.now());
 		entityManager.persist(user);
-		
+
+		var muscleGroupEntity = new MuscleGroupEntity();
+		muscleGroupEntity.setName("CHEST");
+		muscleGroupEntity.setDescription("Chest muscle groups");
+		entityManager.persist(muscleGroupEntity);
+
 		ExerciseEntity exercise = new ExerciseEntity();
 		exercise.setName("Bench Press");
-		exercise.setGroup(MuscleGroup.CHEST);
+		exercise.setMuscleGroup(muscleGroupEntity);
 		entityManager.persist(exercise);
 
 		ExerciseLogEntity log1 = new ExerciseLogEntity();
@@ -100,9 +105,12 @@ class ExerciseLogRepositoryTest {
 		user2.setCreatedAt(LocalDateTime.now());
 		entityManager.persist(user2);
 		
+		MuscleGroupEntity legs = new MuscleGroupEntity(null, "LEGS", "Leg exercises");
+		entityManager.persist(legs);
+		
 		ExerciseEntity exercise = new ExerciseEntity();
 		exercise.setName("Squat");
-		exercise.setGroup(MuscleGroup.LEGS);
+		exercise.setMuscleGroup(legs);
 		entityManager.persist(exercise);
 		
 		ExerciseLogEntity log1 = new ExerciseLogEntity();
@@ -139,9 +147,12 @@ class ExerciseLogRepositoryTest {
 		user.setCreatedAt(LocalDateTime.now());
 		entityManager.persist(user);
 		
+		MuscleGroupEntity back = new MuscleGroupEntity(null, "BACK", "Back exercises");
+		entityManager.persist(back);
+		
 		ExerciseEntity exercise = new ExerciseEntity();
 		exercise.setName("Pull Up");
-		exercise.setGroup(MuscleGroup.BACK);
+		exercise.setMuscleGroup(back);
 		entityManager.persist(exercise);
 		
 		ExerciseLogEntity log = new ExerciseLogEntity();

@@ -1,31 +1,52 @@
 package com.erodrich.exercises.exerciselogging.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.erodrich.exercises.exercise.entity.ExerciseEntity;
-import com.erodrich.exercises.exercise.entity.MuscleGroup;
+import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
+import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseDTO;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseLogDTO;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseSetDTO;
 import com.erodrich.exercises.exerciselogging.entity.ExerciseLogEntity;
 import com.erodrich.exercises.exerciselogging.entity.ExerciseSetEntity;
 
+@ExtendWith(MockitoExtension.class)
 class ExerciseLogMapperTest {
 	
 	private ExerciseLogMapper exerciseLogMapper;
 	
+	@Mock
+	private MuscleGroupRepository muscleGroupRepository;
+	
 	@BeforeEach
 	void setUp() {
-		exerciseLogMapper = new ExerciseLogMapper();
+		exerciseLogMapper = new ExerciseLogMapper(muscleGroupRepository);
+		
+		// Setup mock muscle groups
+		MuscleGroupEntity chest = new MuscleGroupEntity(1L, "CHEST", "Chest exercises");
+		MuscleGroupEntity back = new MuscleGroupEntity(2L, "BACK", "Back exercises");
+		MuscleGroupEntity legs = new MuscleGroupEntity(4L, "LEGS", "Leg exercises");
+		
+		lenient().when(muscleGroupRepository.findByNameIgnoreCase("CHEST")).thenReturn(Optional.of(chest));
+		lenient().when(muscleGroupRepository.findByNameIgnoreCase("BACK")).thenReturn(Optional.of(back));
+		lenient().when(muscleGroupRepository.findByNameIgnoreCase("LEGS")).thenReturn(Optional.of(legs));
 	}
 	
 	@Test
@@ -47,7 +68,7 @@ class ExerciseLogMapperTest {
 		assertThat(entity.isHasFailed()).isFalse();
 		assertThat(entity.getExercise()).isNotNull();
 		assertThat(entity.getExercise().getName()).isEqualTo("Bench Press");
-		assertThat(entity.getExercise().getGroup()).isEqualTo(MuscleGroup.CHEST);
+		assertThat(entity.getExercise().getMuscleGroup().getName()).isEqualTo("CHEST");
 		assertThat(entity.getSets()).hasSize(2);
 	}
 	
@@ -92,10 +113,12 @@ class ExerciseLogMapperTest {
 	@Test
 	void toDTO_withValidEntity_shouldMapCorrectly() {
 		// Given
+		MuscleGroupEntity back = new MuscleGroupEntity(2L, "BACK", "Back exercises");
+		
 		ExerciseEntity exercise = new ExerciseEntity();
 		exercise.setId(1L);
 		exercise.setName("Pull Up");
-		exercise.setGroup(MuscleGroup.BACK);
+		exercise.setMuscleGroup(back);
 		
 		ExerciseSetEntity set1 = new ExerciseSetEntity();
 		set1.setId(1L);

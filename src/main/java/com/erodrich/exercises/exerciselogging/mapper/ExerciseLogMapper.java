@@ -12,8 +12,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.erodrich.exercises.exercise.entity.ExerciseEntity;
-import com.erodrich.exercises.exercise.entity.MuscleGroup;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseDTO;
+import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
+import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseLogDTO;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseSetDTO;
 import com.erodrich.exercises.exerciselogging.entity.ExerciseLogEntity;
@@ -21,6 +22,12 @@ import com.erodrich.exercises.exerciselogging.entity.ExerciseSetEntity;
 
 @Component
 public class ExerciseLogMapper {
+
+	private final MuscleGroupRepository muscleGroupRepository;
+	
+	public ExerciseLogMapper(MuscleGroupRepository muscleGroupRepository) {
+		this.muscleGroupRepository = muscleGroupRepository;
+	}
 
 	private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
 	
@@ -69,7 +76,13 @@ public class ExerciseLogMapper {
 
 		ExerciseEntity entity = new ExerciseEntity();
 		entity.setName(dto.getName());
-		entity.setGroup(MuscleGroup.valueOf(dto.getGroup().toUpperCase()));
+		
+		// Look up the MuscleGroupEntity by name
+		MuscleGroupEntity muscleGroup = muscleGroupRepository
+				.findByNameIgnoreCase(dto.getGroup())
+				.orElseThrow(() -> new IllegalArgumentException(
+						"Invalid muscle group: " + dto.getGroup()));
+		entity.setMuscleGroup(muscleGroup);
 
 		return entity;
 	}
@@ -81,7 +94,11 @@ public class ExerciseLogMapper {
 
 		ExerciseDTO dto = new ExerciseDTO();
 		dto.setName(entity.getName());
-		dto.setGroup(entity.getGroup().name());
+		
+		// Convert MuscleGroupEntity to String for DTO
+		if (entity.getMuscleGroup() != null) {
+			dto.setGroup(entity.getMuscleGroup().getName());
+		}
 
 		return dto;
 	}

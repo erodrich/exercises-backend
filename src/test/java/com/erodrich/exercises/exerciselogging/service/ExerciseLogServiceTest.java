@@ -20,8 +20,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.erodrich.exercises.exercise.entity.ExerciseEntity;
-import com.erodrich.exercises.exercise.entity.MuscleGroup;
 import com.erodrich.exercises.exercise.repository.ExerciseRepository;
+import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
+import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseDTO;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseLogDTO;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseSetDTO;
@@ -51,6 +52,9 @@ class ExerciseLogServiceTest {
 	@Mock
 	private ExerciseLogMapper mapper;
 	
+	@Mock
+	private MuscleGroupRepository muscleGroupRepository;
+	
 	@InjectMocks
 	private ExerciseLogService exerciseLogService;
 	
@@ -67,10 +71,12 @@ class ExerciseLogServiceTest {
 		ExerciseSetDTO setDTO = new ExerciseSetDTO(100.0, 10);
 		ExerciseLogDTO logDTO = new ExerciseLogDTO("12/16/2025 10:30:00", exerciseDTO, Arrays.asList(setDTO), false);
 		
+		MuscleGroupEntity chest = new MuscleGroupEntity(1L, "CHEST", "Chest exercises");
+		
 		ExerciseEntity exercise = new ExerciseEntity();
 		exercise.setId(1L);
 		exercise.setName("Bench Press");
-		exercise.setGroup(MuscleGroup.CHEST);
+		exercise.setMuscleGroup(chest);
 		
 		ExerciseLogEntity logEntity = new ExerciseLogEntity();
 		logEntity.setDate(LocalDateTime.now());
@@ -89,7 +95,8 @@ class ExerciseLogServiceTest {
 		
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(mapper.toEntity(logDTO)).thenReturn(logEntity);
-		when(exerciseRepository.findByNameAndGroup("Bench Press", MuscleGroup.CHEST))
+		when(muscleGroupRepository.findByNameIgnoreCase("CHEST")).thenReturn(Optional.of(chest));
+		when(exerciseRepository.findByNameAndMuscleGroup("Bench Press", chest))
 			.thenReturn(Optional.of(exercise));
 		when(exerciseSetRepository.save(any(ExerciseSetEntity.class))).thenReturn(setEntity);
 		when(exerciseLogRepository.saveAll(any())).thenReturn(Arrays.asList(savedLogEntity));
@@ -130,17 +137,20 @@ class ExerciseLogServiceTest {
 		
 		ExerciseLogEntity logEntity = new ExerciseLogEntity();
 		
+		MuscleGroupEntity legs = new MuscleGroupEntity(4L, "LEGS", "Leg exercises");
+		
 		ExerciseEntity newExercise = new ExerciseEntity();
 		newExercise.setId(1L);
 		newExercise.setName("New Exercise");
-		newExercise.setGroup(MuscleGroup.LEGS);
+		newExercise.setMuscleGroup(legs);
 		
 		ExerciseLogEntity savedLogEntity = new ExerciseLogEntity();
 		savedLogEntity.setId(1L);
 		
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(mapper.toEntity(logDTO)).thenReturn(logEntity);
-		when(exerciseRepository.findByNameAndGroup("New Exercise", MuscleGroup.LEGS))
+		when(muscleGroupRepository.findByNameIgnoreCase("LEGS")).thenReturn(Optional.of(legs));
+		when(exerciseRepository.findByNameAndMuscleGroup("New Exercise", legs))
 			.thenReturn(Optional.empty());
 		when(exerciseRepository.save(any(ExerciseEntity.class))).thenReturn(newExercise);
 		when(exerciseLogRepository.saveAll(any())).thenReturn(Arrays.asList(savedLogEntity));
@@ -219,9 +229,12 @@ class ExerciseLogServiceTest {
 		ExerciseLogEntity savedLogEntity = new ExerciseLogEntity();
 		savedLogEntity.setId(1L);
 		
+		MuscleGroupEntity legs = new MuscleGroupEntity(4L, "LEGS", "Leg exercises");
+		
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(mapper.toEntity(logDTO)).thenReturn(logEntity);
-		when(exerciseRepository.findByNameAndGroup("Squat", MuscleGroup.LEGS))
+		when(muscleGroupRepository.findByNameIgnoreCase("LEGS")).thenReturn(Optional.of(legs));
+		when(exerciseRepository.findByNameAndMuscleGroup("Squat", legs))
 			.thenReturn(Optional.of(exercise));
 		when(exerciseSetRepository.save(any(ExerciseSetEntity.class))).thenReturn(setEntity);
 		when(exerciseLogRepository.saveAll(any())).thenReturn(Arrays.asList(savedLogEntity));
