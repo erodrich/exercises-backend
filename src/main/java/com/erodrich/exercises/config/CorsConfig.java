@@ -25,7 +25,7 @@ public class CorsConfig {
                 String[] origins = allowedOrigins.split(",");
                 
                 registry.addMapping("/**")
-                        .allowedOrigins(origins)
+                        .allowedOriginPatterns("*") // Allow any origin when behind proxy
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                         .allowedHeaders("*")
                         .exposedHeaders("Authorization") // Expose JWT token header
