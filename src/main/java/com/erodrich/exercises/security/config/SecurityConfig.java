@@ -40,6 +40,8 @@ public class SecurityConfig {
 				// Public endpoints
 				.requestMatchers("/api/v1/users/register").permitAll()
 				.requestMatchers("/api/v1/users/login").permitAll()
+				// Public muscle groups (read-only)
+				.requestMatchers("/api/v1/muscle-groups", "/api/v1/muscle-groups/**").permitAll()
 				// Swagger/OpenAPI
 				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 				// Actuator
