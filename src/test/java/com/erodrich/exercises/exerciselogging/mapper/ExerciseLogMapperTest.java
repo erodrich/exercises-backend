@@ -144,7 +144,7 @@ class ExerciseLogMapperTest {
 		
 		// Then
 		assertThat(dto).isNotNull();
-		assertThat(dto.getTimestamp()).isEqualTo("12/16/2025 10:30:00");
+		assertThat(dto.getTimestamp()).isEqualTo("16/12/2025 10:30:00");
 		assertThat(dto.getFailure()).isTrue();
 		assertThat(dto.getExercise()).isNotNull();
 		assertThat(dto.getExercise().getName()).isEqualTo("Pull Up");

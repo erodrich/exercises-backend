@@ -29,14 +29,15 @@ public class ExerciseLogMapper {
 		this.muscleGroupRepository = muscleGroupRepository;
 	}
 
-	private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+	// Use DD/MM/yyyy HH:mm:ss format for output - matches frontend display format
+	private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 	
-	// Support multiple input formats
+	// Support multiple input formats (priority order)
 	private static final DateTimeFormatter[] INPUT_FORMATTERS = {
-			DateTimeFormatter.ISO_DATE_TIME,                    // ISO 8601: 2025-12-18T22:00:00.000Z
-			DateTimeFormatter.ISO_LOCAL_DATE_TIME,              // 2025-12-18T22:00:00
-			DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"), // US format: 12/18/2025 22:00:00
-			DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")  // GB format: 18/12/2025 22:00:00
+			DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"),  // Primary: 19/12/2025 14:30:00
+			DateTimeFormatter.ISO_DATE_TIME,                      // ISO 8601 with timezone: 2025-12-18T22:00:00.000Z
+			DateTimeFormatter.ISO_LOCAL_DATE_TIME,                // ISO 8601 local: 2025-12-18T22:00:00
+			DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")   // US format: 12/18/2025 22:00:00
 	};
 
 	public ExerciseLogEntity toEntity(ExerciseLogDTO dto) {
@@ -168,6 +169,8 @@ public class ExerciseLogMapper {
 		if (dateTime == null) {
 			return null;
 		}
+		// Return DD/MM/yyyy HH:mm:ss format: 19/12/2025 14:30:00
+		// Matches frontend display format
 		return dateTime.format(OUTPUT_FORMATTER);
 	}
 }
