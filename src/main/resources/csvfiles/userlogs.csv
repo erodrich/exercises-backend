@@ -1,0 +1,118 @@
+timestamp,muscle_group,exercise,weight,sets,comments,failure
+10/11/2025 15:49:18,Chest,Incline Dumbbell Press,30,3,"11,10,9",No
+10/11/2025 16:05:37,Chest,Dumbbell Flat Press,32,4,"10,9,10,8",No
+10/11/2025 16:22:44,Shoulders,Seated Overhead Press,20,4,"9,7,8,8",No
+10/11/2025 16:32:48,Shoulders,Dumbbell Lateral Raises,12,3,"12,12,12",No
+10/11/2025 16:42:06,Triceps,Rope Pushdowns,25,3,"13,11,11",No
+10/11/2025 16:51:04,Triceps,Overhead Dumbbell Triceps Extension,14,3,"12,14,13",No
+11/11/2025 16:19:13,Back,Deadlift,120,3,"6,6,7",No
+11/11/2025 16:33:51,Back,Barbell Rows,70,4,"9,8,9,8",No
+11/11/2025 16:50:35,Back,Lat Pulldown,70,4,"9,9,8,10",No
+11/11/2025 16:59:43,Shoulders,Face Pulls,"32,5",3,"12,12,13",No
+11/11/2025 17:09:51,Biceps,Incline Dumbbell Curls,14,3,"10,8,9",No
+11/11/2025 17:18:16,Biceps,Hammer Curls,22,3,"10,10,10",No
+12/11/2025 16:03:50,Legs,Squat on Smith (Machine),30,4,"6,6,6,7",No
+12/11/2025 16:16:43,Legs,Leg Press,160,3,"8,8,8",No
+12/11/2025 16:34:28,Legs,Walking Lunges,10,3,"12,12,12",No
+13/11/2025 15:53:09,Chest,Incline Barbell Press,60,3,"10,12,12",No
+13/11/2025 16:08:16,Chest,Pec Deck Flies,20,3,"12,11,13",No
+13/11/2025 16:20:07,Shoulders,Seated Overhead Press (Machine),60,3,"12,11,10",No
+13/11/2025 16:33:57,Shoulders,Cable Lateral Raises,"7,5",3,"12,12,12",No
+13/11/2025 16:42:41,Triceps,Dips,0,3,"12,12,12",No
+13/11/2025 16:55:45,Triceps,Skull Crushers,25,3,"12,12,12",No
+17/11/2025 16:09:57,Chest,Seated Chest Press,80,4,"10,10,10,12",No
+17/11/2025 16:23:22,Chest,Incline Dumbbell Press,32,3,"9,8,7",No
+17/11/2025 16:41:16,Shoulders,Seated Overhead Press,20,4,"10,8,10,10",No
+17/11/2025 16:52:12,Shoulders,Dumbbell Lateral Raises,10,3,"12,12,13",No
+17/11/2025 17:04:04,Triceps,Rope Pushdowns,25,3,"15,14,15",No
+17/11/2025 17:14:57,Triceps,Overhead Dumbbell Triceps Extension,10,3,"13,14,15",No
+18/11/2025 15:59:08,Back,Deadlift,100,3,"8,7,7",No
+18/11/2025 16:28:16,Back,Dumbbell Rows,26,3,"10,12,10,10",No
+18/11/2025 16:38:33,Shoulders,Face Pulls,"32,5",3,"12,12,12",No
+18/11/2025 16:50:37,Biceps,Incline Dumbbell Curls,16,3,"7,9,9",No
+18/11/2025 17:01:36,Biceps,Hammer Curls,20,3,"10,12,12",No
+19/11/2025 16:08:55,Legs,Hack Squat (Machine),60,4,"7,6,6,6",No
+19/11/2025 16:22:48,Legs,Leg Press,160,3,"10,10,10",No
+19/11/2025 16:40:13,Legs,Walking Lunges,10,3,"12,12,13",No
+19/11/2025 16:52:15,Legs,Leg Curl,40,4,"10,10,10,10",No
+20/11/2025 16:08:36,Chest,Incline Barbell Press,60,3,"9,8,10",No
+20/11/2025 16:23:35,Chest,Dumbbell Flat Press,30,3,"10,10,10",No
+20/11/2025 16:34:08,Shoulders,Arnold Press,20,3,"9,8,8",No
+20/11/2025 16:49:01,Shoulders,Cable Lateral Raises,5,3,"15,15,15",No
+20/11/2025 16:56:43,Triceps,Dips,0,3,"12,12,9",No
+20/11/2025 17:06:16,Triceps,Dumbbell Skull Crushers,8,3,"14,14,14",No
+21/11/2025 16:09:09,Back,Rack Pulls,140,4,"6,6,6,6",No
+21/11/2025 16:23:15,Back,Chest-Supported Rows,100,3,"11,10,12",No
+21/11/2025 16:32:48,Back,Chin-ups,0,3,"5,10,9",No
+21/11/2025 16:47:49,Shoulders,Cable Rear Delt Flies,5,3,"15,15,15",No
+21/11/2025 17:01:59,Biceps,Concentration Curls,16,3,"12,12,12",No
+21/11/2025 17:12:21,Biceps,Cable Rope Curls,"27,5",3,"15,14,12",No
+24/11/2025 16:08:49,Chest,Barbell Bench Press,80,4,"10,10,10,11",No
+24/11/2025 16:24:50,Chest,Incline Dumbbell Press,30,3,"12,10,9",No
+24/11/2025 16:40:36,Shoulders,Seated Overhead Press,22,4,"8,8,7,10",No
+24/11/2025 16:54:42,Shoulders,Dumbbell Lateral Raises,12,3,"15,14,12",No
+24/11/2025 17:04:16,Triceps,Rope Pushdowns,"27,5",3,"15,15,11",No
+24/11/2025 17:14:00,Triceps,Overhead Dumbbell Triceps Extension,15,3,"10,12,11",No
+25/11/2025 16:02:21,Back,Deadlift,120,3,"7,7,6",No
+25/11/2025 16:16:04,Back,Barbell Rows,70,4,"10,10,10,10",No
+25/11/2025 16:32:20,Back,Lat Pulldown,70,4,"10,10,9,9",No
+25/11/2025 16:43:08,Shoulders,Face Pulls,"32,5",3,"15,15,15",No
+25/11/2025 16:55:55,Biceps,Incline Dumbbell Curls,14,3,"11,10,10",No
+25/11/2025 17:07:09,Biceps,Hammer Curls,22,3,"12,12,11",No
+26/11/2025 16:19:24,Legs,Hack Squat (Machine),60,4,"8,8,7,8",No
+26/11/2025 16:32:52,Legs,Walking Lunges,20,3,"10,10,10",No
+26/11/2025 16:46:56,Legs,Leg Press,160,3,"12,12,12",No
+26/11/2025 16:59:54,Legs,Standing Calf Raises,120,4,"15,15,14,15",No
+26/11/2025 17:10:58,Legs,Leg Curl,50,4,"10,8,10,10",No
+27/11/2025 16:21:50,Chest,Incline Barbell Press,60,3,"9,8,8",No
+27/11/2025 16:38:58,Chest,Cable Flies,"12,5",4,"12,12,10,12",No
+27/11/2025 16:50:25,Shoulders,Seated Overhead Press (Machine),70,3,"10,9,8",No
+27/11/2025 17:04:56,Shoulders,Cable Lateral Raises,"7,5",3,"15,15,15",No
+27/11/2025 17:14:57,Triceps,Dips (Machine),120,3,"14,14,13",No
+27/11/2025 17:29:33,Triceps,Skull Crushers,25,3,"15,15,15",No
+29/11/2025 14:28:54,Back,Rack Pulls,140,4,"7,7,7,7",No
+29/11/2025 14:43:26,Back,Chest-Supported Rows,100,3,"11,10,10",No
+29/11/2025 14:56:59,Back,Cable Chin-Ups,70,3,"10,9,10",No
+29/11/2025 15:08:56,Shoulders,Dumbbell Rear Delt Flies,10,3,"12,15,14",No
+29/11/2025 15:17:43,Biceps,Concentration Curls,16,3,"12,10,6",No
+29/11/2025 15:26:27,Biceps,Cable Rope Curls,"27,5",3,"15,15,14",No
+1/12/2025 15:57:18,Chest,Dumbbell Flat Press,32,4,"11,11,10,11",No
+1/12/2025 16:12:43,Chest,Incline Dumbbell Flies,12,3,"15,15,15",No
+1/12/2025 16:28:51,Shoulders,Seated Overhead Press,22,4,"10,10,10,8",No
+1/12/2025 16:41:49,Shoulders,Dumbbell Lateral Raises,12,3,"15,14,13",No
+1/12/2025 16:53:02,Triceps,Cable Triceps Pushdowns,30,3,"15,14,13",No
+1/12/2025 17:03:52,Triceps,Overhead Rope Triceps Extension,"17,5",3,"10,10,10",No
+2/12/2025 15:45:39,Back,Lat Pulldown (Machine),100,4,"10,10,10,10",No
+2/12/2025 16:04:33,Back,Barbell Rows,70,4,"10,10,10,10",No
+2/12/2025 16:25:43,Back,Deadlift,120,3,"7,6,6",No
+2/12/2025 16:38:38,Shoulders,Face Pulls,"32,5",3,"15,15,15",No
+2/12/2025 16:52:03,Biceps,Incline Dumbbell Curls,14,3,"12,10,11",No
+2/12/2025 17:03:00,Biceps,Spider Hammer Curls,16,3,"14,14,14",No
+3/12/2025 16:07:04,Legs,Hack Squat (Machine),60,4,"8,8,8,8",No
+3/12/2025 16:20:14,Legs,Leg Press,160,3,"12,12,12",No
+3/12/2025 16:44:34,Legs,Walking Lunges,20,3,"12,12,12",No
+4/12/2025 16:13:13,Chest,Incline Barbell Press,60,3,"10,10,10",No
+4/12/2025 16:29:32,Chest,Seated Chest Press,90,3,"9,7,7",No
+4/12/2025 16:44:46,Shoulders,Arnold Press,20,3,"10,10,8",No
+4/12/2025 16:59:19,Shoulders,Cable Lateral Raises,"7,5",3,"15,15,15",No
+4/12/2025 17:08:21,Triceps,Dips,0,3,"15,14,12",No
+4/12/2025 17:22:19,Triceps,Skull Crushers,30,3,"10,10,11",No
+9/12/2025 7:56:26,Back,Deadlift,120,3,"7,7,6",No
+9/12/2025 7:56:58,Back,Barbell Rows,80,4,"8,8,8,8",No
+9/12/2025 7:57:40,Back,Lat Pulldown,70,4,"10,10,10,9",No
+9/12/2025 7:58:13,Shoulders,Face Pulls,35,4,"12,12,12,12",No
+9/12/2025 7:59:15,Biceps,Cable Incline Curl,"12,5",3,"11,11,11",No
+9/12/2025 7:59:55,Biceps,Hammer Curls,24,3,"10,10,10",No
+15/12/2025 16:25:16,Chest,Incline Dumbbell Press,32,3,"10,10,8",No
+15/12/2025 16:42:51,Chest,Dumbbell Flat Flies,14,4,"15,15,15,15",No
+15/12/2025 16:59:34,Shoulders,Seated Overhead Press,22,4,"10,9,8,7",No
+15/12/2025 17:13:14,Shoulders,Dumbbell Lateral Raises,12,3,"15,15,15",No
+15/12/2025 17:24:05,Triceps,Cable Triceps Pushdowns,30,3,"15,14,12",No
+15/12/2025 17:34:39,Triceps,Overhead Rope Triceps Extension,"17,5",3,"12,11,12",No
+16/12/2025 15:49:13,Back,Lat Pulldown,70,3,"10,10,10",No
+16/12/2025 16:09:05,Back,Barbell Rows,80,4,"10,10,10,10",No
+16/12/2025 16:30:41,Shoulders,Face Pulls,35,3,"15,15,15",No
+16/12/2025 16:43:21,Biceps,Incline Dumbbell Curls,16,3,"8,7,6",No
+16/12/2025 16:56:13,Biceps,Hammer Curls,24,3,"11,11,11",No
+18/12/2025 15:58:32,Legs,Leg Press,170,3,"10,10,10",No
+18/12/2025 16:20:37,Legs,Leg Curl,50,4,"10,10,10,9",No
