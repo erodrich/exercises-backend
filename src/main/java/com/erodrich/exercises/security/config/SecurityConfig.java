@@ -25,53 +25,56 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-	
+
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final UserDetailsService userDetailsService;
-	
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) {
 		http
-			.csrf(AbstractHttpConfigurer::disable)
-			.cors(cors -> {})
-			.sessionManagement(session -> 
-				session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth
-				// Public endpoints
-				.requestMatchers("/api/v1/users/register").permitAll()
-				.requestMatchers("/api/v1/users/login").permitAll()
-				// Public muscle groups (read-only)
-				.requestMatchers("/api/v1/muscle-groups", "/api/v1/muscle-groups/**").permitAll()
-				// Swagger/OpenAPI
-				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-				// Actuator
-				.requestMatchers("/actuator/health").permitAll()
-				// H2 Console (only for dev)
-				.requestMatchers("/h2-console/**").permitAll()
-				// Admin endpoints require ADMIN role
-				.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-				// All other endpoints require authentication
-				.anyRequest().authenticated()
-			)
-			.authenticationProvider(authenticationProvider)
-			.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-		
+				.csrf(AbstractHttpConfigurer::disable)
+				.cors(cors -> {
+				})
+				.sessionManagement(session ->
+						session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.authorizeHttpRequests(auth -> auth
+						// Public endpoints
+						.requestMatchers("/api/v1/users/register").permitAll()
+						.requestMatchers("/api/v1/users/login").permitAll()
+						// Public muscle groups (read-only)
+						.requestMatchers("/api/v1/muscle-groups", "/api/v1/muscle-groups/**").permitAll()
+						// Public exercises (read-only)
+						.requestMatchers("/api/v1/exercises", "/api/v1/exercises/**").permitAll()
+						// Swagger/OpenAPI
+						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+						// Actuator
+						.requestMatchers("/actuator/health").permitAll()
+						// H2 Console (only for dev)
+						.requestMatchers("/h2-console/**").permitAll()
+						// Admin endpoints require ADMIN role
+						.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+						// All other endpoints require authentication
+						.anyRequest().authenticated()
+				)
+				.authenticationProvider(authenticationProvider)
+				.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
 		return http.build();
 	}
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
 	public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
 		authProvider.setPasswordEncoder(passwordEncoder);
 		return authProvider;
 	}
-	
+
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) {
 		return authConfig.getAuthenticationManager();
