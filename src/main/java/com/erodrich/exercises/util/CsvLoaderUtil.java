@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CsvLoaderUtil {
 
-	public static final String COMMA_DELIMITER = ",";
+	public static final String COMMA_DELIMITER = ";";
 	public static final String PATH_TO_CSV = "csvfiles/userlogs.csv";
 
 	public static void main(String[] args) throws IOException {
