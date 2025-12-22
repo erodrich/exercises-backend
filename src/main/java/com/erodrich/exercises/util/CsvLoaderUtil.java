@@ -18,9 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Utility class to load CSV files
  * Format:
- * timestamp,muscle_group,exercise,weight,sets,comments,failure
- * 10/11/2025 15:49:18,Chest,Incline Dumbbell Press,30,3,"11,10,9",No
- * 10/11/2025 16:05:37,Chest,Dumbbell Flat Press,32,4,"10,9,10,8",No
+ * timestamp;muscle_group;exercise;weight;sets;comments;failure
+ * 10/11/2025 15:49:18;Chest;Incline Dumbbell Press;30;3;11,10,9;No
+ * 10/11/2025 16:05:37;Chest;Dumbbell Flat Press;32;4;10,9,10,8;No
  */
 @Slf4j
 public class CsvLoaderUtil {
