@@ -246,4 +246,47 @@ class ExerciseLogServiceTest {
 		// Then
 		verify(exerciseSetRepository, times(3)).save(any(ExerciseSetEntity.class));
 	}
+	
+	@Test
+	void getLatestLogForExercise_whenLogExists_shouldReturnLatestLog() {
+		// Given
+		Long userId = 1L;
+		Long exerciseId = 2L;
+		
+		ExerciseLogEntity logEntity = new ExerciseLogEntity();
+		logEntity.setId(1L);
+		logEntity.setDate(LocalDateTime.now());
+		
+		ExerciseLogDTO expectedDTO = new ExerciseLogDTO();
+		
+		when(exerciseLogRepository.findFirstByUserIdAndExerciseIdOrderByDateDesc(userId, exerciseId))
+			.thenReturn(Optional.of(logEntity));
+		when(mapper.toDTO(logEntity)).thenReturn(expectedDTO);
+		
+		// When
+		Optional<ExerciseLogDTO> result = exerciseLogService.getLatestLogForExercise(userId, exerciseId);
+		
+		// Then
+		assertThat(result).isPresent();
+		assertThat(result.get()).isEqualTo(expectedDTO);
+		verify(exerciseLogRepository).findFirstByUserIdAndExerciseIdOrderByDateDesc(userId, exerciseId);
+		verify(mapper).toDTO(logEntity);
+	}
+	
+	@Test
+	void getLatestLogForExercise_whenNoLogExists_shouldReturnEmpty() {
+		// Given
+		Long userId = 1L;
+		Long exerciseId = 2L;
+		
+		when(exerciseLogRepository.findFirstByUserIdAndExerciseIdOrderByDateDesc(userId, exerciseId))
+			.thenReturn(Optional.empty());
+		
+		// When
+		Optional<ExerciseLogDTO> result = exerciseLogService.getLatestLogForExercise(userId, exerciseId);
+		
+		// Then
+		assertThat(result).isEmpty();
+		verify(exerciseLogRepository).findFirstByUserIdAndExerciseIdOrderByDateDesc(userId, exerciseId);
+	}
 }

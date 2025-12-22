@@ -2,6 +2,7 @@ package com.erodrich.exercises.exerciselogging.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,12 @@ public class ExerciseLogService {
 		return exerciseLogRepository.findByUserId(userId).stream()
 				.map(mapper::toDTO)
 				.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<ExerciseLogDTO> getLatestLogForExercise(Long userId, Long exerciseId) {
+		return exerciseLogRepository.findFirstByUserIdAndExerciseIdOrderByDateDesc(userId, exerciseId)
+				.map(mapper::toDTO);
 	}
 
 	private ExerciseLogEntity convertAndPrepareEntity(ExerciseLogDTO dto, UserEntity user) {

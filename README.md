@@ -155,6 +155,7 @@ docker-compose up -d
 
 ### Exercise Logging Endpoints
 - `GET /api/v1/users/{userId}/logs` - Get all logs for user
+- `GET /api/v1/users/{userId}/logs/latest?exerciseId={exerciseId}` - Get latest log for specific exercise
 - `POST /api/v1/users/{userId}/logs` - Create logs for user
 
 ## Testing
@@ -168,7 +169,7 @@ docker-compose up -d
 ```
 
 **Test Coverage:**
-- ✅ 64 tests passing
+- ✅ 69 tests passing (5 new tests for latest log feature)
 - Unit tests for all mappers
 - Integration tests for repositories (H2)
 - Unit tests with mocks for services

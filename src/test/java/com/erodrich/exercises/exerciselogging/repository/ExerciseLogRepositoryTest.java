@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,5 +168,144 @@ class ExerciseLogRepositoryTest {
 		// Then
 		assertThat(saved.getId()).isNotNull();
 		assertThat(saved.isHasFailed()).isTrue();
+	}
+	
+	@Test
+	void findFirstByUserIdAndExerciseIdOrderByDateDesc_whenLogsExist_shouldReturnLatestLog() {
+		// Given
+		UserEntity user = new UserEntity();
+		user.setUsername("testuser");
+		user.setPassword("pass");
+		user.setEmail("test@email.com");
+		user.setCreatedAt(LocalDateTime.now());
+		entityManager.persist(user);
+		
+		MuscleGroupEntity chest = new MuscleGroupEntity(null, "CHEST", "Chest exercises");
+		entityManager.persist(chest);
+		
+		ExerciseEntity exercise = new ExerciseEntity();
+		exercise.setName("Bench Press");
+		exercise.setMuscleGroup(chest);
+		entityManager.persist(exercise);
+		
+		ExerciseLogEntity oldLog = new ExerciseLogEntity();
+		oldLog.setUser(user);
+		oldLog.setExercise(exercise);
+		oldLog.setDate(LocalDateTime.now().minusDays(2));
+		oldLog.setHasFailed(false);
+		entityManager.persist(oldLog);
+		
+		ExerciseLogEntity latestLog = new ExerciseLogEntity();
+		latestLog.setUser(user);
+		latestLog.setExercise(exercise);
+		latestLog.setDate(LocalDateTime.now());
+		latestLog.setHasFailed(true);
+		entityManager.persist(latestLog);
+		
+		entityManager.flush();
+		
+		// When
+		Optional<ExerciseLogEntity> found = exerciseLogRepository
+				.findFirstByUserIdAndExerciseIdOrderByDateDesc(user.getId(), exercise.getId());
+		
+		// Then
+		assertThat(found).isPresent();
+		assertThat(found.get().getId()).isEqualTo(latestLog.getId());
+		assertThat(found.get().isHasFailed()).isTrue();
+	}
+	
+	@Test
+	void findFirstByUserIdAndExerciseIdOrderByDateDesc_whenNoLogsExist_shouldReturnEmpty() {
+		// Given
+		UserEntity user = new UserEntity();
+		user.setUsername("testuser");
+		user.setPassword("pass");
+		user.setEmail("test@email.com");
+		user.setCreatedAt(LocalDateTime.now());
+		entityManager.persist(user);
+		
+		MuscleGroupEntity chest = new MuscleGroupEntity(null, "CHEST", "Chest exercises");
+		entityManager.persist(chest);
+		
+		ExerciseEntity exercise = new ExerciseEntity();
+		exercise.setName("Bench Press");
+		exercise.setMuscleGroup(chest);
+		entityManager.persist(exercise);
+		
+		entityManager.flush();
+		
+		// When
+		Optional<ExerciseLogEntity> found = exerciseLogRepository
+				.findFirstByUserIdAndExerciseIdOrderByDateDesc(user.getId(), exercise.getId());
+		
+		// Then
+		assertThat(found).isEmpty();
+	}
+	
+	@Test
+	void findFirstByUserIdAndExerciseIdOrderByDateDesc_shouldFilterByUserAndExercise() {
+		// Given
+		UserEntity user1 = new UserEntity();
+		user1.setUsername("user1");
+		user1.setPassword("pass");
+		user1.setEmail("user1@email.com");
+		user1.setCreatedAt(LocalDateTime.now());
+		entityManager.persist(user1);
+		
+		UserEntity user2 = new UserEntity();
+		user2.setUsername("user2");
+		user2.setPassword("pass");
+		user2.setEmail("user2@email.com");
+		user2.setCreatedAt(LocalDateTime.now());
+		entityManager.persist(user2);
+		
+		MuscleGroupEntity chest = new MuscleGroupEntity(null, "CHEST", "Chest exercises");
+		entityManager.persist(chest);
+		
+		ExerciseEntity benchPress = new ExerciseEntity();
+		benchPress.setName("Bench Press");
+		benchPress.setMuscleGroup(chest);
+		entityManager.persist(benchPress);
+		
+		ExerciseEntity inclinePress = new ExerciseEntity();
+		inclinePress.setName("Incline Press");
+		inclinePress.setMuscleGroup(chest);
+		entityManager.persist(inclinePress);
+		
+		// User1 log for Bench Press
+		ExerciseLogEntity user1BenchLog = new ExerciseLogEntity();
+		user1BenchLog.setUser(user1);
+		user1BenchLog.setExercise(benchPress);
+		user1BenchLog.setDate(LocalDateTime.now());
+		user1BenchLog.setHasFailed(false);
+		entityManager.persist(user1BenchLog);
+		
+		// User2 log for Bench Press
+		ExerciseLogEntity user2BenchLog = new ExerciseLogEntity();
+		user2BenchLog.setUser(user2);
+		user2BenchLog.setExercise(benchPress);
+		user2BenchLog.setDate(LocalDateTime.now());
+		user2BenchLog.setHasFailed(true);
+		entityManager.persist(user2BenchLog);
+		
+		// User1 log for Incline Press
+		ExerciseLogEntity user1InclineLog = new ExerciseLogEntity();
+		user1InclineLog.setUser(user1);
+		user1InclineLog.setExercise(inclinePress);
+		user1InclineLog.setDate(LocalDateTime.now());
+		user1InclineLog.setHasFailed(false);
+		entityManager.persist(user1InclineLog);
+		
+		entityManager.flush();
+		
+		// When
+		Optional<ExerciseLogEntity> found = exerciseLogRepository
+				.findFirstByUserIdAndExerciseIdOrderByDateDesc(user1.getId(), benchPress.getId());
+		
+		// Then
+		assertThat(found).isPresent();
+		assertThat(found.get().getId()).isEqualTo(user1BenchLog.getId());
+		assertThat(found.get().getUser().getId()).isEqualTo(user1.getId());
+		assertThat(found.get().getExercise().getId()).isEqualTo(benchPress.getId());
 	}
 }
