@@ -13,25 +13,25 @@ import org.springframework.stereotype.Component;
 
 import com.erodrich.exercises.exercise.entity.ExerciseEntity;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseDTO;
-import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
-import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseLogDTO;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseSetDTO;
 import com.erodrich.exercises.exerciselogging.entity.ExerciseLogEntity;
 import com.erodrich.exercises.exerciselogging.entity.ExerciseSetEntity;
+import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
+import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 
 @Component
 public class ExerciseLogMapper {
 
 	private final MuscleGroupRepository muscleGroupRepository;
-	
+
 	public ExerciseLogMapper(MuscleGroupRepository muscleGroupRepository) {
 		this.muscleGroupRepository = muscleGroupRepository;
 	}
 
 	// Use DD/MM/yyyy HH:mm:ss format for output - matches frontend display format
 	private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-	
+
 	// Support multiple input formats (priority order)
 	private static final DateTimeFormatter[] INPUT_FORMATTERS = {
 			DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"),  // Primary: 19/12/2025 14:30:00
@@ -44,7 +44,6 @@ public class ExerciseLogMapper {
 		if (dto == null) {
 			return null;
 		}
-
 		ExerciseLogEntity entity = new ExerciseLogEntity();
 		entity.setDate(parseTimestamp(dto.getTimestamp()));
 		entity.setHasFailed(dto.getFailure() != null && dto.getFailure());
@@ -77,7 +76,7 @@ public class ExerciseLogMapper {
 
 		ExerciseEntity entity = new ExerciseEntity();
 		entity.setName(dto.getName());
-		
+
 		// Look up the MuscleGroupEntity by name
 		MuscleGroupEntity muscleGroup = muscleGroupRepository
 				.findByNameIgnoreCase(dto.getGroup())
@@ -95,7 +94,7 @@ public class ExerciseLogMapper {
 
 		ExerciseDTO dto = new ExerciseDTO();
 		dto.setName(entity.getName());
-		
+
 		// Convert MuscleGroupEntity to String for DTO
 		if (entity.getMuscleGroup() != null) {
 			dto.setGroup(entity.getMuscleGroup().getName());
@@ -138,11 +137,11 @@ public class ExerciseLogMapper {
 		return dto;
 	}
 
-		private LocalDateTime parseTimestamp(String timestamp) {
+	private LocalDateTime parseTimestamp(String timestamp) {
 		if (timestamp == null || timestamp.isEmpty()) {
 			return LocalDateTime.now();
 		}
-		
+
 		// First, try to parse as ISO 8601 with timezone (e.g., "2025-12-18T21:16:15.651Z")
 		try {
 			Instant instant = Instant.parse(timestamp);
@@ -150,7 +149,7 @@ public class ExerciseLogMapper {
 		} catch (DateTimeParseException e) {
 			// Not an ISO 8601 with timezone, try other formats
 		}
-		
+
 		// Try parsing with each formatter until one succeeds
 		for (DateTimeFormatter formatter : INPUT_FORMATTERS) {
 			try {
@@ -159,7 +158,7 @@ public class ExerciseLogMapper {
 				// Try next formatter
 			}
 		}
-		
+
 		// If all formatters fail, return current time and log warning
 		System.err.println("Failed to parse timestamp: " + timestamp + ", using current time");
 		return LocalDateTime.now();

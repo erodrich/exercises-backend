@@ -4,15 +4,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.erodrich.exercises.exercise.entity.ExerciseEntity;
 import com.erodrich.exercises.exercise.repository.ExerciseRepository;
-import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
-import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseLogDTO;
 import com.erodrich.exercises.exerciselogging.dto.ExerciseSetDTO;
 import com.erodrich.exercises.exerciselogging.entity.ExerciseLogEntity;
@@ -20,6 +17,8 @@ import com.erodrich.exercises.exerciselogging.entity.ExerciseSetEntity;
 import com.erodrich.exercises.exerciselogging.mapper.ExerciseLogMapper;
 import com.erodrich.exercises.exerciselogging.repository.ExerciseLogRepository;
 import com.erodrich.exercises.exerciselogging.repository.ExerciseSetRepository;
+import com.erodrich.exercises.musclegroup.entity.MuscleGroupEntity;
+import com.erodrich.exercises.musclegroup.repository.MuscleGroupRepository;
 import com.erodrich.exercises.user.entity.UserEntity;
 import com.erodrich.exercises.user.repository.UserRepository;
 
@@ -40,23 +39,23 @@ public class ExerciseLogService {
 	public List<ExerciseLogDTO> saveLogs(Long userId, List<ExerciseLogDTO> logDTOs) {
 		UserEntity user = userRepository.findById(userId)
 				.orElseThrow(() -> new IllegalArgumentException("User not found"));
-		
+
 		List<ExerciseLogEntity> entities = logDTOs.stream()
 				.map(dto -> convertAndPrepareEntity(dto, user))
-				.collect(Collectors.toList());
+				.toList();
 
 		List<ExerciseLogEntity> savedEntities = exerciseLogRepository.saveAll(entities);
 
 		return savedEntities.stream()
 				.map(mapper::toDTO)
-				.collect(Collectors.toList());
+				.toList();
 	}
 
 	@Transactional(readOnly = true)
 	public List<ExerciseLogDTO> getAllLogs(Long userId) {
 		return exerciseLogRepository.findByUserId(userId).stream()
 				.map(mapper::toDTO)
-				.collect(Collectors.toList());
+				.toList();
 	}
 
 	@Transactional(readOnly = true)
@@ -74,7 +73,7 @@ public class ExerciseLogService {
 				.findByNameIgnoreCase(dto.getExercise().getGroup())
 				.orElseThrow(() -> new IllegalArgumentException(
 						"Invalid muscle group: " + dto.getExercise().getGroup()));
-		
+
 		// Find or create exercise
 		ExerciseEntity exercise = findOrCreateExercise(
 				dto.getExercise().getName(),
