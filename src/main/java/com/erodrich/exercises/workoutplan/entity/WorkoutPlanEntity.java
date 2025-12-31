@@ -28,7 +28,7 @@ public class WorkoutPlanEntity {
 	private Integer duration;
 	private DurationUnitEnum durationUnit;
 	private boolean isActive;
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "workout_plan_id")
 	private List<WorkoutDayEntity> workoutDayEntityList;
 	@ManyToOne

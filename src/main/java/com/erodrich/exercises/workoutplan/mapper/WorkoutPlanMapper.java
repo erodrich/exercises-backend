@@ -1,7 +1,9 @@
 package com.erodrich.exercises.workoutplan.mapper;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
@@ -36,7 +38,7 @@ public class WorkoutPlanMapper {
 				.duration(entity.getDuration())
 				.durationUnit(entity.getDurationUnit())
 				.isActive(entity.isActive())
-				.workoutDayDTOList(workoutDayDTOs)
+				.workoutDays(workoutDayDTOs)
 				.build();
 	}
 
@@ -44,8 +46,17 @@ public class WorkoutPlanMapper {
 		if (dto == null) {
 			return null;
 		}
+		return toEntity(user, dto, null);
+	}
 
-		WorkoutPlanEntity entity = new WorkoutPlanEntity();
+	public WorkoutPlanEntity toEntity(UserEntity user, WorkoutPlanDTO dto, WorkoutPlanEntity entity) {
+		if (dto == null) {
+			return null;
+		}
+		if (entity == null) {
+			entity = new WorkoutPlanEntity();
+		}
+
 		entity.setId(dto.getId());
 		entity.setName(dto.getName());
 		entity.setDuration(dto.getDuration());
@@ -54,11 +65,30 @@ public class WorkoutPlanMapper {
 		entity.setUser(user);
 
 		// Map workout days
-		if (dto.getWorkoutDayDTOList() != null) {
-			List<WorkoutDayEntity> workoutDayEntities = dto.getWorkoutDayDTOList().stream()
-					.map(workoutDayMapper::toEntity)
-					.toList();
-			entity.setWorkoutDayEntityList(workoutDayEntities);
+		if (dto.getWorkoutDays() != null) {
+			if (entity.getWorkoutDayEntityList() == null) {
+				var workoutDayEntities = new ArrayList<WorkoutDayEntity>();
+				for (var workoutDayDto : dto.getWorkoutDays()) {
+					if (workoutDayDto.getId() == null) {
+						workoutDayEntities.add(workoutDayMapper.toEntity(workoutDayDto));
+					}
+				}
+				entity.setWorkoutDayEntityList(workoutDayEntities);
+			} else {
+				var newWorkoutDayList = new ArrayList<WorkoutDayEntity>();
+				for (var workoutDayDto : dto.getWorkoutDays()) {
+					if (workoutDayDto.getId() != null) {
+						entity.getWorkoutDayEntityList().stream()
+								.filter(workoutDayEntity -> Objects.equals(workoutDayEntity.getId(), workoutDayDto.getId()))
+								.findFirst()
+								.ifPresent(workoutDayEntity -> newWorkoutDayList.add(workoutDayMapper.toEntity(workoutDayDto, workoutDayEntity)));
+					} else {
+						newWorkoutDayList.add(workoutDayMapper.toEntity(workoutDayDto));
+					}
+				}
+				entity.getWorkoutDayEntityList().clear();
+				entity.getWorkoutDayEntityList().addAll(newWorkoutDayList);
+			}
 		}
 
 		return entity;

@@ -22,5 +22,5 @@ public class WorkoutPlanDTO {
 	private Integer duration;
 	private DurationUnitEnum durationUnit;
 	private boolean isActive;
-	private List<WorkoutDayDTO> workoutDayDTOList;
+	private List<WorkoutDayDTO> workoutDays;
 }

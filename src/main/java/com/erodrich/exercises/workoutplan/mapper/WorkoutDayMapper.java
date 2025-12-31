@@ -1,8 +1,9 @@
 package com.erodrich.exercises.workoutplan.mapper;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
@@ -16,24 +17,24 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class WorkoutDayMapper {
-	
+
 	private final ExerciseTargetMapper exerciseTargetMapper;
-	
+
 	public WorkoutDayDTO toDTO(WorkoutDayEntity entity) {
 		if (entity == null) {
 			return null;
 		}
-		
+
 		List<ExerciseTargetDTO> exerciseDTOs = entity.getExerciseTargetEntityList() != null
 				? entity.getExerciseTargetEntityList().stream()
-						.map(exerciseTargetMapper::toDTO)
-						.collect(Collectors.toList())
+				.map(exerciseTargetMapper::toDTO)
+				.toList()
 				: Collections.emptyList();
-		
-		Long workoutPlanId = entity.getWorkoutPlanEntityList() != null
-				? entity.getWorkoutPlanEntityList().getId()
+
+		Long workoutPlanId = entity.getWorkoutPlanEntity() != null
+				? entity.getWorkoutPlanEntity().getId()
 				: null;
-		
+
 		return WorkoutDayDTO.builder()
 				.id(entity.getId())
 				.description(entity.getDescription())
@@ -41,26 +42,57 @@ public class WorkoutDayMapper {
 				.exercises(exerciseDTOs)
 				.build();
 	}
-	
+
 	public WorkoutDayEntity toEntity(WorkoutDayDTO dto) {
 		if (dto == null) {
 			return null;
 		}
-		
-		WorkoutDayEntity entity = new WorkoutDayEntity();
+		return toEntity(dto, null);
+	}
+
+
+	public WorkoutDayEntity toEntity(WorkoutDayDTO dto, WorkoutDayEntity entity) {
+		if (dto == null) {
+			return null;
+		}
+		if (entity == null) {
+			entity = new WorkoutDayEntity();
+		}
 		entity.setId(dto.getId());
 		entity.setDescription(dto.getDescription());
-		
+
 		// Map exercise targets
 		if (dto.getExercises() != null) {
-			List<ExerciseTargetEntity> exerciseEntities = dto.getExercises().stream()
-					.map(exerciseTargetMapper::toEntity)
-					.collect(Collectors.toList());
-			entity.setExerciseTargetEntityList(exerciseEntities);
+			// No exercise targets
+			if (entity.getExerciseTargetEntityList() == null || entity.getExerciseTargetEntityList().isEmpty()) {
+				var exerciseEntities = new ArrayList<ExerciseTargetEntity>();
+				for (var exerciseTargetDto : dto.getExercises()) {
+					if (exerciseTargetDto.getId() == null) {
+						exerciseEntities.add(exerciseTargetMapper.toEntity(exerciseTargetDto));
+					}
+				}
+				entity.setExerciseTargetEntityList(exerciseEntities);
+			} else {
+				// Existing exercise targets
+				var newExerciseTargetList = new ArrayList<ExerciseTargetEntity>();
+				for (var exerciseTargetDto : dto.getExercises()) {
+					if (exerciseTargetDto.getId() != null) {
+						entity.getExerciseTargetEntityList().stream()
+								.filter(exerciseTargetEntity -> Objects.equals(exerciseTargetEntity.getId(), exerciseTargetDto.getId()))
+								.findFirst()
+								.ifPresent(exerciseTargetEntity -> newExerciseTargetList.add(
+										exerciseTargetMapper.toEntity(exerciseTargetDto, exerciseTargetEntity)));
+					} else {
+						newExerciseTargetList.add(exerciseTargetMapper.toEntity(exerciseTargetDto));
+					}
+				}
+				entity.getExerciseTargetEntityList().clear();
+				entity.getExerciseTargetEntityList().addAll(newExerciseTargetList);
+			}
 		}
-		
+
 		// Note: WorkoutPlan relationship is set from the parent side
-		
+
 		return entity;
 	}
 }

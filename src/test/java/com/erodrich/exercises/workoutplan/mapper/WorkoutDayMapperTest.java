@@ -35,8 +35,10 @@ class WorkoutDayMapperTest {
 	private MuscleGroupEntity chest;
 	private ExerciseEntity benchPress;
 	private ExerciseDTO benchPressDTO;
-	private ExerciseTargetEntity target1;
-	private ExerciseTargetDTO targetDTO1;
+	private ExerciseTargetEntity existingTargetEntity;
+	private ExerciseTargetEntity newExerciseTargetEntity;
+	private ExerciseTargetDTO existingExerciseTargetDto;
+	private ExerciseTargetDTO newExerciseTargetDto;
 
 	@BeforeEach
 	void setUp() {
@@ -46,17 +48,19 @@ class WorkoutDayMapperTest {
 		benchPress = WorkoutPlanTestDataBuilder.createExercise(1L, "Bench Press", chest);
 		benchPressDTO = WorkoutPlanTestDataBuilder.createExerciseDTO(1L, "Bench Press", "CHEST");
 
-		target1 = WorkoutPlanTestDataBuilder.createExerciseTarget(1L, benchPress, 4, 8, 12);
-		targetDTO1 = WorkoutPlanTestDataBuilder.createExerciseTargetDTO(1L, benchPressDTO, 4, 8, 12);
+		existingTargetEntity = WorkoutPlanTestDataBuilder.createExerciseTarget(1L, benchPress, 4, 8, 12);
+		existingExerciseTargetDto = WorkoutPlanTestDataBuilder.createExerciseTargetDTO(1L, benchPressDTO, 4, 8, 12);
+		newExerciseTargetDto = WorkoutPlanTestDataBuilder.createExerciseTargetDTO(null, benchPressDTO, 4, 8, 12);
+		newExerciseTargetEntity = WorkoutPlanTestDataBuilder.createExerciseTarget(null, benchPress, 4, 8, 12);
 	}
 
 	@Test
 	void toDTO_withValidEntity_shouldMapAllFields() {
 		// Given
 		WorkoutDayEntity entity = WorkoutPlanTestDataBuilder.createWorkoutDayWithExercises(
-				1L, "Push Day", target1);
+				1L, "Push Day", existingTargetEntity);
 
-		when(exerciseTargetMapper.toDTO(target1)).thenReturn(targetDTO1);
+		when(exerciseTargetMapper.toDTO(existingTargetEntity)).thenReturn(existingExerciseTargetDto);
 
 		// When
 		WorkoutDayDTO dto = mapper.toDTO(entity);
@@ -101,9 +105,9 @@ class WorkoutDayMapperTest {
 		ExerciseTargetDTO targetDTO2 = WorkoutPlanTestDataBuilder.createExerciseTargetDTO(2L, squatDTO, 3, 6, 10);
 
 		WorkoutDayEntity entity = WorkoutPlanTestDataBuilder.createWorkoutDayWithExercises(
-				1L, "Full Body", target1, target2);
+				1L, "Full Body", existingTargetEntity, target2);
 
-		when(exerciseTargetMapper.toDTO(target1)).thenReturn(targetDTO1);
+		when(exerciseTargetMapper.toDTO(existingTargetEntity)).thenReturn(existingExerciseTargetDto);
 		when(exerciseTargetMapper.toDTO(target2)).thenReturn(targetDTO2);
 
 		// When
@@ -112,7 +116,7 @@ class WorkoutDayMapperTest {
 		// Then
 		assertThat(dto).isNotNull();
 		assertThat(dto.getExercises()).hasSize(2);
-		assertThat(dto.getExercises()).containsExactly(targetDTO1, targetDTO2);
+		assertThat(dto.getExercises()).containsExactly(existingExerciseTargetDto, targetDTO2);
 	}
 
 	@Test
@@ -137,7 +141,7 @@ class WorkoutDayMapperTest {
 				10L, "Test Plan", 12, DurationUnitEnum.WEEKS, true, user, new ArrayList<>());
 
 		WorkoutDayEntity entity = WorkoutPlanTestDataBuilder.createSimpleWorkoutDay(1L, "Test Day");
-		entity.setWorkoutPlanEntityList(plan);
+		entity.setWorkoutPlanEntity(plan);
 
 		// When
 		WorkoutDayDTO dto = mapper.toDTO(entity);
@@ -148,19 +152,17 @@ class WorkoutDayMapperTest {
 	}
 
 	@Test
-	void toEntity_withValidDTO_shouldMapAllFields() {
+	void toNewEntity_withValidDTO_shouldMapAllFields() {
 		// Given
 		WorkoutDayDTO dto = WorkoutPlanTestDataBuilder.createWorkoutDayDTO(
-				1L, "Push Day", 10L, Arrays.asList(targetDTO1));
-
-		when(exerciseTargetMapper.toEntity(targetDTO1)).thenReturn(target1);
+				null, "Push Day", 10L, Arrays.asList(newExerciseTargetDto));
+		when(exerciseTargetMapper.toEntity(newExerciseTargetDto)).thenReturn(newExerciseTargetEntity);
 
 		// When
 		WorkoutDayEntity entity = mapper.toEntity(dto);
 
 		// Then
 		assertThat(entity).isNotNull();
-		assertThat(entity.getId()).isEqualTo(1L);
 		assertThat(entity.getDescription()).isEqualTo("Push Day");
 		assertThat(entity.getExerciseTargetEntityList()).hasSize(1);
 	}
@@ -175,18 +177,17 @@ class WorkoutDayMapperTest {
 	}
 
 	@Test
-	void toEntity_withExercises_shouldMapUsingExerciseTargetMapper() {
+	void toNewEntity_withNewExercises_shouldMapUsingExerciseTargetMapper() {
 		// Given
 		WorkoutDayDTO dto = WorkoutPlanTestDataBuilder.createWorkoutDayDTO(
-				1L, "Push Day", 10L, Arrays.asList(targetDTO1));
-
-		when(exerciseTargetMapper.toEntity(targetDTO1)).thenReturn(target1);
+				null, "Push Day", 10L, Arrays.asList(newExerciseTargetDto));
+		when(exerciseTargetMapper.toEntity(newExerciseTargetDto)).thenReturn(newExerciseTargetEntity);
 
 		// When
 		WorkoutDayEntity entity = mapper.toEntity(dto);
 
 		// Then
-		assertThat(entity.getExerciseTargetEntityList()).containsExactly(target1);
+		assertThat(entity.getExerciseTargetEntityList()).containsExactly(newExerciseTargetEntity);
 	}
 
 	@Test
@@ -207,10 +208,10 @@ class WorkoutDayMapperTest {
 	void bidirectionalMapping_shouldPreserveData() {
 		// Given
 		WorkoutDayEntity originalEntity = WorkoutPlanTestDataBuilder.createWorkoutDayWithExercises(
-				1L, "Push Day", target1);
+				1L, "Push Day", newExerciseTargetEntity);
 
-		when(exerciseTargetMapper.toDTO(target1)).thenReturn(targetDTO1);
-		when(exerciseTargetMapper.toEntity(targetDTO1)).thenReturn(target1);
+		when(exerciseTargetMapper.toDTO(newExerciseTargetEntity)).thenReturn(newExerciseTargetDto);
+		when(exerciseTargetMapper.toEntity(newExerciseTargetDto)).thenReturn(newExerciseTargetEntity);
 
 		// When
 		WorkoutDayDTO dto = mapper.toDTO(originalEntity);

@@ -115,7 +115,7 @@ public class WorkoutPlanTestDataBuilder {
 				.duration(duration)
 				.durationUnit(unit)
 				.isActive(active)
-				.workoutDayDTOList(days != null ? days : new ArrayList<>())
+				.workoutDays(days != null ? days : new ArrayList<>())
 				.build();
 	}
 

@@ -38,8 +38,17 @@ public class ExerciseTargetMapper {
 		if (dto == null) {
 			return null;
 		}
+		return toEntity(dto, null);
+	}
 
-		ExerciseTargetEntity entity = new ExerciseTargetEntity();
+	public ExerciseTargetEntity toEntity(ExerciseTargetDTO dto, ExerciseTargetEntity entity) {
+		if (dto == null) {
+			return null;
+		}
+		if (entity == null) {
+			entity = new ExerciseTargetEntity();
+		}
+
 		entity.setId(dto.getId());
 		entity.setSets(dto.getSets());
 		entity.setMinReps(dto.getMinReps());

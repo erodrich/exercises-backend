@@ -24,11 +24,11 @@ public class WorkoutDayEntity {
 	private Long id;
 	private String description;
 
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "workout_day_id")
 	private List<ExerciseTargetEntity> exerciseTargetEntityList;
 
 	@ManyToOne
 	@JoinColumn(name = "workout_plan_id")
-	private WorkoutPlanEntity workoutPlanEntityList;
+	private WorkoutPlanEntity workoutPlanEntity;
 }

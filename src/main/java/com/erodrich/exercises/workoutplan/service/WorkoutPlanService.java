@@ -53,8 +53,8 @@ public class WorkoutPlanService {
 		var workoutPlanFound = workoutPlanRepository.findByUserIdAndId(userId, workoutPlanId)
 				.orElseThrow(() -> new IllegalArgumentException("User's workout plan not found"));
 
-		WorkoutPlanEntity workoutPlanEntity = mapper.toEntity(user, workoutPlanDTO);
-		workoutPlanEntity.setId(workoutPlanFound.getId());
+		WorkoutPlanEntity workoutPlanEntity = mapper.toEntity(user, workoutPlanDTO, workoutPlanFound);
+
 		var updatedWorkoutPlan = workoutPlanRepository.save(workoutPlanEntity);
 
 		return mapper.toDTO(updatedWorkoutPlan);

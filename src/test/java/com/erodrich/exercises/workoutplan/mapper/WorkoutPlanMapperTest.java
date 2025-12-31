@@ -34,7 +34,9 @@ class WorkoutPlanMapperTest {
 
 	private UserEntity user;
 	private WorkoutDayEntity day1;
+	private WorkoutDayEntity newDay1;
 	private WorkoutDayDTO dayDTO1;
+	private WorkoutDayDTO newDayDTO1;
 
 	@BeforeEach
 	void setUp() {
@@ -43,6 +45,8 @@ class WorkoutPlanMapperTest {
 		user = WorkoutPlanTestDataBuilder.createUser(1L, "testuser", "test@example.com");
 		day1 = WorkoutPlanTestDataBuilder.createSimpleWorkoutDay(1L, "Push Day");
 		dayDTO1 = WorkoutPlanTestDataBuilder.createWorkoutDayDTO(1L, "Push Day", null, new ArrayList<>());
+		newDayDTO1 = WorkoutPlanTestDataBuilder.createWorkoutDayDTO(null, "Push Day", null, new ArrayList<>());
+		newDay1 = WorkoutPlanTestDataBuilder.createSimpleWorkoutDay(null, "Push Day");
 	}
 
 	@Test
@@ -83,7 +87,7 @@ class WorkoutPlanMapperTest {
 
 		// Then
 		assertThat(dto).isNotNull();
-		assertThat(dto.getWorkoutDayDTOList()).isEmpty();
+		assertThat(dto.getWorkoutDays()).isEmpty();
 	}
 
 	@Test
@@ -103,8 +107,8 @@ class WorkoutPlanMapperTest {
 
 		// Then
 		assertThat(dto).isNotNull();
-		assertThat(dto.getWorkoutDayDTOList()).hasSize(2);
-		assertThat(dto.getWorkoutDayDTOList()).containsExactly(dayDTO1, dayDTO2);
+		assertThat(dto.getWorkoutDays()).hasSize(2);
+		assertThat(dto.getWorkoutDays()).containsExactly(dayDTO1, dayDTO2);
 	}
 
 	@Test
@@ -135,8 +139,8 @@ class WorkoutPlanMapperTest {
 		assertThat(dto).isNotNull();
 		assertThat(dto.getId()).isEqualTo(1L);
 		assertThat(dto.getName()).isEqualTo("Full Program");
-		assertThat(dto.getWorkoutDayDTOList()).hasSize(1);
-		assertThat(dto.getWorkoutDayDTOList().get(0)).isEqualTo(dayDTO1);
+		assertThat(dto.getWorkoutDays()).hasSize(1);
+		assertThat(dto.getWorkoutDays().get(0)).isEqualTo(dayDTO1);
 	}
 
 	@Test
@@ -184,26 +188,26 @@ class WorkoutPlanMapperTest {
 	void toEntity_withWorkoutDays_shouldMapUsingWorkoutDayMapper() {
 		// Given
 		WorkoutPlanDTO dto = WorkoutPlanTestDataBuilder.createWorkoutPlanDTO(
-				1L, "PPL Program", 12, DurationUnitEnum.WEEKS, true, 1L, Arrays.asList(dayDTO1));
+				1L, "PPL Program", 12, DurationUnitEnum.WEEKS, true, 1L, Arrays.asList(newDayDTO1));
 
-		when(workoutDayMapper.toEntity(dayDTO1)).thenReturn(day1);
+		when(workoutDayMapper.toEntity(newDayDTO1)).thenReturn(newDay1);
 
 		// When
 		WorkoutPlanEntity entity = mapper.toEntity(user, dto);
 
 		// Then
 		assertThat(entity.getWorkoutDayEntityList()).hasSize(1);
-		assertThat(entity.getWorkoutDayEntityList()).containsExactly(day1);
+		assertThat(entity.getWorkoutDayEntityList()).containsExactly(newDay1);
 	}
 
 	@Test
 	void bidirectionalMapping_shouldPreserveData() {
 		// Given
 		WorkoutPlanEntity originalEntity = WorkoutPlanTestDataBuilder.createWorkoutPlanWithDays(
-				1L, "Test Program", user, day1);
+				1L, "Test Program", user, newDay1);
 
-		when(workoutDayMapper.toDTO(day1)).thenReturn(dayDTO1);
-		when(workoutDayMapper.toEntity(dayDTO1)).thenReturn(day1);
+		when(workoutDayMapper.toDTO(newDay1)).thenReturn(newDayDTO1);
+		when(workoutDayMapper.toEntity(newDayDTO1)).thenReturn(newDay1);
 
 		// When
 		WorkoutPlanDTO dto = mapper.toDTO(originalEntity);
